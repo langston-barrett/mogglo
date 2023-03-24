@@ -1,0 +1,63 @@
+name: release
+
+on:
+  push:
+    branches:
+    - release*
+    tags:
+    - 'v*'
+
+env:
+  # The NAME makes it easier to copy/paste snippets from other CI configs
+  NAME: mogglo
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deps
+      run: |
+        sudo apt-get install -y musl-tools
+        rustup target add x86_64-unknown-linux-musl
+
+    - name: Build static executables
+      run: |
+        cargo build \
+          --bin ${NAME}-c \
+          --bin ${NAME}-css \
+          --bin ${NAME}-java \
+          --bin ${NAME}-javascript \
+          --bin ${NAME}-rust \
+          --bin ${NAME}-typescript \
+          --bin ${NAME}-swift \
+          --locked \
+          --release \
+          --target=x86_64-unknown-linux-musl
+        cp target/x86_64-unknown-linux-musl/release/${NAME}-{c,css,java,javascript,rust,typescript,swift} .
+
+    - uses: ncipollo/release-action@v1
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      with:
+        artifacts: "mogglo-c,mogglo-css,mogglo-java,mogglo-javascript,mogglo-rust,mogglo-typescript,mogglo-swift"
+        artifactErrorsFailBuild: true
+        body: "See [CHANGELOG.md](https://github.com/langston-barrett/mogglo/blob/main/CHANGELOG.md)."
+        draft: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish to crates.io
+      env:
+        CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        # Only push on actual release tags
+        PUSH: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      run: |
+        for pkg in ${NAME}{,-c,-cpp,-css,-java,-javascript,-html,-python,-ruby,-rust,-typescript,-swift}; do
+          if [[ ${PUSH} == true ]]; then
+            cargo publish --token ${CRATES_IO_TOKEN} -p "${pkg}"
+          else
+            cargo publish --dry-run --token ${CRATES_IO_TOKEN} -p "${pkg}"
+            break
+          fi
+          sleep 5
+        done

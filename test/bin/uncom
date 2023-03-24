@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Remove comments to avoid erroneously matching them with FileCheck.
+
+grep -E -v '^//'

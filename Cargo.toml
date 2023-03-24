@@ -1,0 +1,20 @@
+[workspace] 
+members = [
+    "crates/mogglo",
+    "crates/mogglo-c",
+    "crates/mogglo-cpp",
+    "crates/mogglo-css",
+    "crates/mogglo-haskell",
+    "crates/mogglo-html",
+    "crates/mogglo-java",
+    "crates/mogglo-javascript",
+    "crates/mogglo-python",
+    "crates/mogglo-ruby",
+    "crates/mogglo-rust",
+    "crates/mogglo-swift",
+    "crates/mogglo-typescript",
+]
+
+# https://nnethercote.github.io/perf-book/build-configuration.html
+[profile.release]
+lto = true
