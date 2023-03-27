@@ -5,7 +5,7 @@ use tree_sitter::{Language, Node, Tree};
 
 use crate::{
     env::{Env, Metavar},
-    lua::{eval_lua, eval_lua_scope, LuaData},
+    lua::{eval_lua, eval_lua_scope, LuaData, LuaNode},
 };
 
 pub(crate) fn parse(language: Language, code: &str) -> Tree {
@@ -414,70 +414,67 @@ impl Pattern {
                 };
                 let mut binds = Env::default();
                 // TODO: Handle errors
-                let matched = lua
-                    .context(|lua_ctx| {
-                        let loaded = match lua_ctx.load(code).set_name("lua code") {
-                            Err(e) => {
-                                eprintln!("Bad Lua code: {code}");
-                                return Err(e);
-                            }
-                            Ok(l) => l,
-                        };
-                        lua_ctx.scope(|scope| {
-                            let globals = lua_ctx.globals();
-                            globals.set("t", candidate.as_str())?;
-                            globals.set("k", candidate.node.kind())?;
-                            globals.set(
-                                "bind",
-                                scope.create_function_mut(|_, m: String| {
-                                    binds.insert(Metavar(m), candidate.node);
-                                    Ok(())
-                                })?,
-                            )?;
-                            // TODO: Option to export metavariables
-                            globals.set(
-                                "match",
-                                scope.create_function(|_, p: String| {
-                                    let pat = Pattern::parse_from(self.lang, p, self.exprs.len());
-                                    Ok(pat
-                                        .match_node_internal(
-                                            lua,
-                                            env.clone(),
-                                            pat.to_goal(),
-                                            candidate,
-                                        )
-                                        .is_some())
-                                })?,
-                            )?;
-                            // TODO: Option to export metavariables
-                            globals.set(
-                                "rec",
-                                scope.create_function(|_, p: String| {
-                                    let pat = Pattern::parse_from(self.lang, p, self.exprs.len());
-                                    Ok(!pat
-                                        .matches_internal(
-                                            candidate.text,
-                                            candidate.node,
-                                            &env,
-                                            true,
-                                            Some(1),
-                                        )
-                                        .is_empty())
-                                })?,
-                            )?;
-                            eval_lua_scope::<bool>(lua_ctx, scope, loaded, &data)
-                        })
+                let matched = lua.context(|lua_ctx| {
+                    let loaded = match lua_ctx.load(code).set_name("lua code") {
+                        Err(e) => {
+                            eprintln!("Bad Lua code: {code}");
+                            return Err(e);
+                        }
+                        Ok(l) => l,
+                    };
+                    lua_ctx.scope(|scope| {
+                        let globals = lua_ctx.globals();
+                        globals.set("focus", LuaNode::new(candidate.node, candidate.text))?;
+                        globals.set("t", candidate.as_str())?;
+                        globals.set("k", candidate.node.kind())?;
+                        globals.set(
+                            "bind",
+                            scope.create_function_mut(|_, m: String| {
+                                binds.insert(Metavar(m), candidate.node);
+                                Ok(())
+                            })?,
+                        )?;
+                        // TODO: Option to export metavariables
+                        globals.set(
+                            "match",
+                            scope.create_function(|_, p: String| {
+                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len());
+                                Ok(pat
+                                    .match_node_internal(lua, env.clone(), pat.to_goal(), candidate)
+                                    .is_some())
+                            })?,
+                        )?;
+                        // TODO: Option to export metavariables
+                        globals.set(
+                            "rec",
+                            scope.create_function(|_, p: String| {
+                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len());
+                                Ok(!pat
+                                    .matches_internal(
+                                        candidate.text,
+                                        candidate.node,
+                                        &env,
+                                        true,
+                                        Some(1),
+                                    )
+                                    .is_empty())
+                            })?,
+                        )?;
+                        eval_lua_scope::<bool>(lua_ctx, scope, loaded, &data)
                     })
-                    .ok()?;
+                });
                 // TODO: Maybe check for collisions
                 env.extend(binds);
-                if matched {
-                    Some(Match {
+                match matched {
+                    Ok(true) => Some(Match {
                         env,
                         root: candidate.node,
-                    })
-                } else {
-                    None
+                    }),
+                    Ok(false) => None,
+                    Err(e) => {
+                        eprintln!("{e}");
+                        None
+                    }
                 }
             }
         }
