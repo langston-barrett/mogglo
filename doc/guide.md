@@ -132,8 +132,17 @@ access to a "structured" API for AST nodes. The type of node objects is denoted
   [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.child_count)
 - `kind() -> String`:
   [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.kind)
+- `next_named_sibling() -> Option<Node>`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.next_named_sibling)
+- `next_sibling() -> Option<Node>`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.next_sibling)
+- `prev_named_sibling() -> Option<Node>`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.prev_named_sibling)
+- `prev_sibling() -> Option<Node>`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.prev_sibling)
 - `parent() -> Option<Node>`:
   [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.parent)
+- `text() -> String`: Return the text of the node
 
 ### State and evaluation order
 
