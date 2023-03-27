@@ -1,6 +1,6 @@
 [package]
 name = "mogglo"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2021"
 description = "Multi-language AST-based code search and rewriting"
 keywords = ["ast", "codemod", "code-search", "grep", "tree-sitter"]
