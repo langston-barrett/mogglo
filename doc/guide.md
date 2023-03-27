@@ -16,6 +16,23 @@ The special metavariable `$_` matches any syntax node, and multiple uses don't
 imply equality. For example, `$_ == $_` finds an equality comparison between
 any two expressions.
 
+The special metavariable `$..` (read "ellipsis") can match any number of
+sibling nodes in the AST. For example, here's how to find the main function:
+```
+fn main() $.. { $.. }
+```
+
+## Matching nodes with multiple children
+
+Consider that there are several possible readings of the following pattern:
+```
+{ $f($x); $y + $z; }
+```
+It might only match blocks with exactly two statements. It might match a block
+that contains a call *immediately* followed by an addition. In fact, Mogglo
+interprets this pattern as matching any block that contains a function call and
+is followed *at some point* by an addition.
+
 ## Lua
 
 Lua code is written between curly braces: `${{lua code goes here}}`.

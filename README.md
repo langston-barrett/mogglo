@@ -40,11 +40,10 @@ fancy output like:
 ───╯
 ```
 
-Lua code is wrapped in braces. The Lua variable `t` holds the text of the AST
-node in question. Here's are two ways to find palindromic let-bound variables:
+Lua code is wrapped in braces. Lua can recursively match patterns with `rec`.
+Here's a pattern to detect out-of-bounds array accesses:
 ```sh
-mogglo-rust 'let ${{ string.reverse(t) == t }} = $y;' ./**/*.rs
-mogglo-rust 'let $x = $y;' --where 'string.reverse(x) == x' ./**/*.rs
+mogglo-rust 'while $i <= $buf.len() { ${{ rec("$buf.get($i)") }} }' ./**/*.rs
 ```
 
 Here's how to [unroll][unroll] a simple loop:

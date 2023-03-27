@@ -25,16 +25,21 @@ pub struct TmpVar(String);
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum FindExpr {
     Anonymous,
+    Ellipsis,
     Metavar(Metavar),
     Lua(LuaCode),
 }
 
 impl FindExpr {
     const ANONYMOUS: &str = "_";
+    const ELLIPSIS: &str = "..";
 
     pub fn parse(s: String) -> Self {
         if s == Self::ANONYMOUS {
             return Self::Anonymous;
+        }
+        if s == Self::ELLIPSIS {
+            return Self::Ellipsis;
         }
         Self::Metavar(Metavar(s))
     }
@@ -47,13 +52,6 @@ pub struct Pattern {
     text: String,
     tree: Tree,
     r#where: Vec<LuaCode>,
-    // NOTE[expression-hack]: tree-sitter will try to parse the pattern as
-    // a whole program, which can fail if e.g., the language is Rust and the
-    // pattern is `$x + $y` (which is not valid at the top level of a program).
-    // When parsing the pattern fails, we try wrapping the pattern in braces
-    // or ending it with a semicolon, and then unwrapping it into an expression
-    // when transforming it into a goal.
-    expression_hack: bool,
 }
 
 #[derive(Copy, Clone)]
@@ -133,6 +131,7 @@ impl Pattern {
         TmpVar(format!("mogglo_tmp_var_{i}"))
     }
 
+    // TODO: Disallow anything after ellipses
     fn parse_from(lang: Language, pat: String, mut vars: usize) -> Pattern {
         let mut peek = pat.chars().peekable();
         let mut nest = 0;
@@ -159,6 +158,14 @@ impl Pattern {
                     vars += 1;
                     text += &tvar.0;
                     exprs.insert(tvar, FindExpr::Anonymous);
+                }
+
+                // $..
+                if peek.next_if_eq(&'.').is_some() && peek.next_if_eq(&'.').is_some() {
+                    let tvar = Self::meta(vars);
+                    vars += 1;
+                    text += &tvar.0;
+                    exprs.insert(tvar, FindExpr::Ellipsis);
                 }
 
                 // $x
@@ -194,11 +201,14 @@ impl Pattern {
             }
         }
 
-        // NOTE[expression-hack]
-        let mut expression_hack = false;
+        // NOTE[expression-hack]: tree-sitter will try to parse the pattern
+        // as a whole program, which can fail if e.g., the language is Rust
+        // and the pattern is `$x + $y` (which is not valid at the top level
+        // of a program). When parsing the pattern fails, we try wrapping the
+        // pattern in braces or ending it with a semicolon, and then unwrapping
+        // it into an expression when transforming it into a goal.
         let mut tree = parse(lang, &text);
         if tree.root_node().has_error() {
-            expression_hack = true;
             text = format!("{{ {text} }}");
             tree = parse(lang, &text);
             if tree.root_node().has_error() {
@@ -209,14 +219,12 @@ impl Pattern {
                 }
             }
         }
-
         Self {
             exprs,
             lang,
             text,
             tree,
             r#where: Vec::new(),
-            expression_hack,
         }
     }
 
@@ -261,23 +269,18 @@ impl Pattern {
             return None;
         }
 
-        if candidate_count == 0 {
-            // ex:
-            // candidate: { }
-            // goal: { p; }
-            return None;
-        }
-
         if goal.node.kind_id() == candidate.node.kind_id() {
-            // Match all children, up to ellipses
             let mut goal_child = goal.child(0);
             let mut candidate_child = candidate.child(0);
             loop {
-                eprintln!(
-                    "MATCHING {} WITH {}",
-                    goal_child.as_str(),
-                    candidate_child.as_str()
-                );
+                if let Some(FindExpr::Ellipsis) =
+                    self.exprs.get(&TmpVar(goal_child.as_str().to_string()))
+                {
+                    return Some(Match {
+                        env,
+                        root: candidate.node,
+                    });
+                }
                 if let Some(m) =
                     self.match_node_internal(lua, env.clone(), goal_child, candidate_child)
                 {
@@ -337,6 +340,7 @@ impl Pattern {
                 env,
                 root: candidate.node,
             }),
+            FindExpr::Ellipsis => panic!("Unhandled ellipsis"),
             FindExpr::Metavar(m) => match env.0.get(m) {
                 None => {
                     env.insert(m.clone(), candidate.node);
@@ -536,10 +540,8 @@ impl Pattern {
             goal = goal.child(0).unwrap();
         }
         // See NOTE[expression-hack]
-        if self.expression_hack {
-            while goal.named_child_count() == 1 {
-                goal = goal.named_child(0).unwrap();
-            }
+        while goal.named_child_count() == 1 {
+            goal = goal.named_child(0).unwrap();
         }
         Goal {
             node: goal,
@@ -560,6 +562,10 @@ impl Pattern {
             match expr {
                 FindExpr::Anonymous => {
                     eprintln!("`$_` is not valid in replacements");
+                    return String::new();
+                }
+                FindExpr::Ellipsis => {
+                    eprintln!("`$..` is not valid in replacements");
                     return String::new();
                 }
                 FindExpr::Metavar(mvar @ Metavar(mtxt)) => match m.env.0.get(mvar) {
@@ -809,19 +815,6 @@ mod tests {
             matches("if $x == $y {}", &tree, text)
         );
 
-        let text = "if a == () { let b = c; }";
-        let tree = super::parse(language(), text);
-        assert_eq!(
-            Some(HashMap::from([
-                (Metavar("x".to_string()), HashSet::from(["a"])),
-                (Metavar("y".to_string()), HashSet::from(["()"]))
-            ])),
-            matches("if $x == $y { $.. }", &tree, text)
-        );
-    }
-
-    #[test]
-    fn test_ellipses() {
         let text = "{ a; b; c; }";
         let tree = super::parse(language(), text);
         assert_eq!(
@@ -842,6 +835,43 @@ mod tests {
             ])),
             matches("{ $x; $y + $z; }", &tree, text)
         );
+
+        let text = "if a == () { let b = c; }";
+        let tree = super::parse(language(), text);
+        assert_eq!(
+            Some(HashMap::from([
+                (Metavar("x".to_string()), HashSet::from(["a"])),
+                (Metavar("y".to_string()), HashSet::from(["()"]))
+            ])),
+            matches("if $x == $y { $.. }", &tree, text)
+        );
+    }
+
+    #[test]
+    fn test_ellipses() {
+        // let text = "{ a; b; c; }";
+        // let tree = super::parse(language(), text);
+        // assert_eq!(Some(HashMap::new()), matches("{ $.. }", &tree, text));
+
+        let text = "{ a; b; c; }";
+        let tree = super::parse(language(), text);
+        assert_eq!(
+            Some(HashMap::from([(
+                Metavar("x".to_string()),
+                HashSet::from(["a"])
+            ),])),
+            matches("{ $x; $.. }", &tree, text)
+        );
+
+        let text = "{ a; b; c; }";
+        let tree = super::parse(language(), text);
+        assert_eq!(
+            Some(HashMap::from([(
+                Metavar("x".to_string()),
+                HashSet::from(["b"])
+            ),])),
+            matches("{ $..; $x; $.. }", &tree, text)
+        );
     }
 
     #[test]
@@ -852,7 +882,7 @@ mod tests {
             Vec::from([HashMap::from([
                 (Metavar("x".to_string()), HashSet::from(["b"])),
                 (Metavar("y".to_string()), HashSet::from(["c"]))
-            ]),]),
+            ])]),
             all_matches("let $x = $y;", &tree, text)
         );
     }
