@@ -28,10 +28,11 @@ Consider that there are several possible readings of the following pattern:
 ```
 { $f($x); $y + $z; }
 ```
-It might only match blocks with exactly two statements. It might match a block
-that contains a call *immediately* followed by an addition. In fact, Mogglo
-interprets this pattern as matching any block that contains a function call and
-is followed *at some point* by an addition.
+It might only match blocks with exactly two statements, a call and an addition.
+It might match a block that contains any number of statements, as long as there
+is call followed *immediately* by an addition. In fact, Mogglo interprets this
+pattern as matching any block that contains any number of statements, including
+a function call that is followed *at some point* by an addition.
 
 ## Lua
 
