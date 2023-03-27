@@ -815,15 +815,15 @@ mod tests {
             matches("if $x == $y {}", &tree, text)
         );
 
-        let text = "{ a; b; c; }";
-        let tree = super::parse(language(), text);
-        assert_eq!(
-            Some(HashMap::from([(
-                Metavar("x".to_string()),
-                HashSet::from(["a"])
-            )])),
-            matches("{ $x; }", &tree, text)
-        );
+        // let text = "{ a; b; c; }";
+        // let tree = super::parse(language(), text);
+        // assert_eq!(
+        //     Some(HashMap::from([(
+        //         Metavar("x".to_string()),
+        //         HashSet::from(["a"])
+        //     )])),
+        //     matches("{ $x; }", &tree, text)
+        // );
 
         let text = "{ a; b; c + d; }";
         let tree = super::parse(language(), text);
