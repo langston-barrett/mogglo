@@ -16,21 +16,6 @@ The special metavariable `$_` matches any syntax node, and multiple uses don't
 imply equality. For example, `$_ == $_` finds an equality comparison between
 any two expressions.
 
-The special metavariable `$..` (read "ellipsis") can match any number of
-sibling nodes in the AST. For example, here's how to find the main function:
-```
-fn main() $.. { $.. }
-```
-
-<!-- TODO: Make this true
-
-The semantics of `$..` are as follows. Let `P` be any other part of a pattern,
-e.g., a metavariable or piece of syntax. Then `$.. P` matches (in the language
-of parsers, consumes) nodes until the first node that `P` matches. Ellipses
-function like the non-greedy regular expression `.*?P`.
-
--->
-
 ## Lua
 
 Lua code is written between curly braces: `${{lua code goes here}}`.

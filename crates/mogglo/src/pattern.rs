@@ -25,21 +25,16 @@ pub struct TmpVar(String);
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum FindExpr {
     Anonymous,
-    Ellipsis,
     Metavar(Metavar),
     Lua(LuaCode),
 }
 
 impl FindExpr {
     const ANONYMOUS: &str = "_";
-    const ELLIPSIS: &str = "..";
 
     pub fn parse(s: String) -> Self {
         if s == Self::ANONYMOUS {
             return Self::Anonymous;
-        }
-        if s == Self::ELLIPSIS {
-            return Self::Ellipsis;
         }
         Self::Metavar(Metavar(s))
     }
@@ -93,7 +88,7 @@ impl<'tree> Goal<'tree> {
         })
     }
 
-    fn parent(&self) -> Option<Self> {
+    fn _parent(&self) -> Option<Self> {
         self.node.parent().map(|node| Self {
             node,
             text: self.text,
@@ -138,7 +133,6 @@ impl Pattern {
         TmpVar(format!("mogglo_tmp_var_{i}"))
     }
 
-    // TODO: Reject multiple consecutive ellipses
     fn parse_from(lang: Language, pat: String, mut vars: usize) -> Pattern {
         let mut peek = pat.chars().peekable();
         let mut nest = 0;
@@ -165,14 +159,6 @@ impl Pattern {
                     vars += 1;
                     text += &tvar.0;
                     exprs.insert(tvar, FindExpr::Anonymous);
-                }
-
-                // $..
-                if peek.next_if_eq(&'.').is_some() && peek.next_if_eq(&'.').is_some() {
-                    let tvar = Self::meta(vars);
-                    vars += 1;
-                    text += &tvar.0;
-                    exprs.insert(tvar, FindExpr::Ellipsis);
                 }
 
                 // $x
@@ -278,26 +264,8 @@ impl Pattern {
         if candidate_count == 0 {
             // ex:
             // candidate: { }
-            // goal: { p; $.. }
-            if goal_count > 1 {
-                return None;
-            }
-            if let Some(FindExpr::Ellipsis) =
-                self.exprs.get(&TmpVar(goal.child(0).as_str().to_string()))
-            {
-                // ex:
-                // candidate: { }
-                // goal: { $.. }
-                return Some(Match {
-                    env,
-                    root: candidate.node,
-                });
-            } else {
-                // ex:
-                // candidate: { }
-                // goal: { p; }
-                return None;
-            }
+            // goal: { p; }
+            return None;
         }
 
         if goal.node.kind_id() == candidate.node.kind_id() {
@@ -305,89 +273,41 @@ impl Pattern {
             let mut goal_child = goal.child(0);
             let mut candidate_child = candidate.child(0);
             loop {
-                // eprintln!(
-                //     "MATCHING {} WITH {}",
-                //     goal_child.as_str(),
-                //     candidate_child.as_str()
-                // );
-                if let Some(FindExpr::Ellipsis) =
-                    self.exprs.get(&TmpVar(goal_child.as_str().to_string()))
+                eprintln!(
+                    "MATCHING {} WITH {}",
+                    goal_child.as_str(),
+                    candidate_child.as_str()
+                );
+                if let Some(m) =
+                    self.match_node_internal(lua, env.clone(), goal_child, candidate_child)
                 {
-                    if let Some(mut next) = goal_child.next_sibling() {
-                        // HACK: Make ellipses work nicely in semicolon-
-                        // delimited languages...
-                        while next.as_str().trim() == ";" {
-                            if let Some(next2) = next.next_sibling() {
-                                next = next2;
-                            } else if let Some(p) = next.parent() {
-                                if let Some(next2) = p.next_sibling() {
-                                    next = next2
-                                } else {
-                                    break;
-                                }
-                            } else {
-                                break;
-                            }
+                    env.extend(m.env);
+                    match (goal_child.next_sibling(), candidate_child.next_sibling()) {
+                        (Some(gnext), Some(cnext)) => {
+                            goal_child = gnext;
+                            candidate_child = cnext;
                         }
-
-                        // Keep consuming nodes until the next child of the goal matches
-                        if let Some(m) =
-                            self.match_node_internal(lua, env.clone(), next, candidate_child)
-                        {
-                            env.extend(m.env);
-                            goal_child = next;
-
-                            // TODO: candidate_child will be matched again on
-                            // the next iteration...
-                            continue;
-                        } else {
-                            // No match; continue looking
-                            if let Some(c_next) = candidate_child.next_sibling() {
-                                candidate_child = c_next;
-                                continue;
-                            } else {
-                                // Couldn't match whatever came after the ellipsis
-                                return None;
-                            }
+                        (None, Some(_)) => {
+                            return Some(Match {
+                                env,
+                                root: candidate.node,
+                            })
                         }
-                    } else {
-                        // An ellipsis is the last remaining child of the goal,
-                        // it matches all remaining children of the candidate.
-                        return Some(Match {
-                            env,
-                            root: candidate.node,
-                        });
+                        (Some(gnext), None) => {
+                            // Might be an ellipsis
+                            goal_child = gnext;
+                        }
+                        (None, None) => {
+                            return Some(Match {
+                                env,
+                                root: candidate.node,
+                            })
+                        }
                     }
                 } else {
-                    // Non-ellipsis, must match directly
-                    if let Some(m) =
-                        self.match_node_internal(lua, env.clone(), goal_child, candidate_child)
-                    {
-                        env.extend(m.env);
-                        match (goal_child.next_sibling(), candidate_child.next_sibling()) {
-                            (Some(gnext), Some(cnext)) => {
-                                goal_child = gnext;
-                                candidate_child = cnext;
-                            }
-                            (None, Some(_)) => {
-                                return Some(Match {
-                                    env,
-                                    root: candidate.node,
-                                })
-                            }
-                            (Some(gnext), None) => {
-                                // Might be an ellipsis
-                                goal_child = gnext;
-                            }
-                            (None, None) => {
-                                return Some(Match {
-                                    env,
-                                    root: candidate.node,
-                                })
-                            }
-                        }
-                    } else {
-                        return None;
+                    match candidate_child.next_sibling() {
+                        None => return None,
+                        Some(cnext) => candidate_child = cnext,
                     }
                 }
             }
@@ -413,7 +333,6 @@ impl Pattern {
         candidate: Candidate<'tree>,
     ) -> Option<Match<'tree>> {
         match expr {
-            FindExpr::Ellipsis => panic!("Unhandled ellipsis"),
             FindExpr::Anonymous => Some(Match {
                 env,
                 root: candidate.node,
@@ -643,10 +562,6 @@ impl Pattern {
                     eprintln!("`$_` is not valid in replacements");
                     return String::new();
                 }
-                FindExpr::Ellipsis => {
-                    eprintln!("`$..` is not valid in replacements");
-                    return String::new();
-                }
                 FindExpr::Metavar(mvar @ Metavar(mtxt)) => match m.env.0.get(mvar) {
                     Some(matching_nodes) => {
                         if let Some(node) = matching_nodes.iter().next() {
@@ -787,10 +702,6 @@ mod tests {
             pat("$_").exprs
         );
         assert_eq!(
-            HashMap::from([(Pattern::meta(0), FindExpr::Ellipsis)]),
-            pat("$..").exprs
-        );
-        assert_eq!(
             HashMap::from([(Pattern::meta(0), FindExpr::Lua(LuaCode("true".to_string())))]),
             pat("${{true}}").exprs
         );
@@ -918,18 +829,19 @@ mod tests {
                 Metavar("x".to_string()),
                 HashSet::from(["a"])
             )])),
-            matches("{ $x; $.. }", &tree, text)
+            matches("{ $x; }", &tree, text)
         );
 
-        // let text = "{ a; b; c + d; }";
-        // let tree = super::parse(language(), text);
-        // assert_eq!(
-        //     Some(HashMap::from([
-        //         (Metavar("x".to_string()), HashSet::from(["c"])),
-        //         (Metavar("y".to_string()), HashSet::from(["d"]))
-        //     ])),
-        //     matches("{ $..; $x + $y; }", &tree, text)
-        // );
+        let text = "{ a; b; c + d; }";
+        let tree = super::parse(language(), text);
+        assert_eq!(
+            Some(HashMap::from([
+                (Metavar("x".to_string()), HashSet::from(["a"])),
+                (Metavar("y".to_string()), HashSet::from(["c"])),
+                (Metavar("z".to_string()), HashSet::from(["d"]))
+            ])),
+            matches("{ $x; $y + $z; }", &tree, text)
+        );
     }
 
     #[test]
