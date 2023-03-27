@@ -78,6 +78,13 @@ impl<'tree> Goal<'tree> {
             text: self.text,
         }
     }
+
+    fn next_sibling(&self) -> Option<Self> {
+        self.node.next_sibling().map(|node| Self {
+            node,
+            text: self.text,
+        })
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -97,6 +104,13 @@ impl<'tree> Candidate<'tree> {
             text: self.text,
         }
     }
+
+    fn next_sibling(&self) -> Option<Self> {
+        self.node.next_sibling().map(|node| Self {
+            node,
+            text: self.text,
+        })
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -110,6 +124,7 @@ impl Pattern {
         TmpVar(format!("mogglo_tmp_var_{i}"))
     }
 
+    // TODO: Reject multiple consecutive ellipses
     fn parse_from(lang: Language, pat: String, mut vars: usize) -> Pattern {
         let mut peek = pat.chars().peekable();
         let mut nest = 0;
@@ -221,46 +236,125 @@ impl Pattern {
         goal: Goal,
         candidate: Candidate<'tree>,
     ) -> Option<Match<'tree>> {
-        let count = goal.node.child_count();
-        if count == 0 {
+        let goal_count = goal.node.child_count();
+        let candidate_count = candidate.node.child_count();
+
+        if goal_count == 0 {
+            // ex:
+            // candidate: { x; }
+            // goal: { }
+            if candidate_count != 0 {
+                return None;
+            }
+            // ex:
+            // candidate: x
+            // goal: x
             if Self::match_leaf_node(goal, candidate) {
                 return Some(Match {
                     env,
                     root: candidate.node,
                 });
             }
+            // ex:
+            // candidate: x
+            // goal: y
             return None;
         }
-        if goal.node.kind_id() == candidate.node.kind_id() {
-            // Match all children, up to ellipses
-            let candidate_children = candidate.node.child_count();
-            for i in 0..count {
-                let child = goal.child(i);
-                // TODO: Avoid allocation
-                if let Some(FindExpr::Ellipsis) =
-                    self.exprs.get(&TmpVar(child.as_str().to_string()))
-                {
-                    // TODO: What if something comes after $..?
-                    return Some(Match {
-                        env,
-                        root: candidate.node,
-                    });
-                }
-                if count > candidate_children {
-                    return None;
-                }
-                if let Some(m) =
-                    self.match_node_internal(lua, env.clone(), goal.child(i), candidate.child(i))
-                {
-                    env.extend(m.env);
-                    continue;
-                }
+
+        if candidate_count == 0 {
+            // ex:
+            // candidate: { }
+            // goal: { p; $.. }
+            if goal_count > 1 {
                 return None;
             }
-            Some(Match {
-                env,
-                root: candidate.node,
-            })
+            if let Some(FindExpr::Ellipsis) =
+                self.exprs.get(&TmpVar(goal.child(0).as_str().to_string()))
+            {
+                // ex:
+                // candidate: { }
+                // goal: { $.. }
+                return Some(Match {
+                    env,
+                    root: candidate.node,
+                });
+            } else {
+                // ex:
+                // candidate: { }
+                // goal: { p; }
+                return None;
+            }
+        }
+
+        if goal.node.kind_id() == candidate.node.kind_id() {
+            // Match all children, up to ellipses
+            let mut goal_child = goal.child(0);
+            let mut candidate_child = candidate.child(0);
+            loop {
+                if let Some(FindExpr::Ellipsis) =
+                    self.exprs.get(&TmpVar(goal_child.as_str().to_string()))
+                {
+                    if let Some(next) = goal_child.next_sibling() {
+                        // Keep consuming nodes until the next child of the goal matches
+                        if let Some(m) =
+                            self.match_node_internal(lua, env.clone(), next, candidate_child)
+                        {
+                            env.extend(m.env);
+                            goal_child = next;
+                            // TODO: candidate_child will be matched again on
+                            // the next iteration...
+                            continue;
+                        } else {
+                            // No match; continue looking
+                            if let Some(c_next) = candidate_child.next_sibling() {
+                                candidate_child = c_next;
+                                continue;
+                            } else {
+                                // Couldn't match whatever came after the ellipsis
+                                return None;
+                            }
+                        }
+                    } else {
+                        // An ellipsis is the last remaining child of the goal,
+                        // it matches all remaining children of the candidate.
+                        return Some(Match {
+                            env,
+                            root: candidate.node,
+                        });
+                    }
+                } else {
+                    // Non-ellipsis, must match directly
+                    if let Some(m) =
+                        self.match_node_internal(lua, env.clone(), goal_child, candidate_child)
+                    {
+                        env.extend(m.env);
+                        match (goal_child.next_sibling(), candidate_child.next_sibling()) {
+                            (Some(gnext), Some(cnext)) => {
+                                goal_child = gnext;
+                                candidate_child = cnext;
+                            }
+                            (None, Some(_)) => {
+                                return Some(Match {
+                                    env,
+                                    root: candidate.node,
+                                })
+                            }
+                            (Some(gnext), None) => {
+                                // Might be an ellipsis
+                                goal_child = gnext;
+                            }
+                            (None, None) => {
+                                return Some(Match {
+                                    env,
+                                    root: candidate.node,
+                                })
+                            }
+                        }
+                    } else {
+                        return None;
+                    }
+                }
+            }
         } else {
             // Match goal with any child
             for i in 0..candidate.node.child_count() {
@@ -781,6 +875,29 @@ mod tests {
             ])),
             matches("if $x == $y { $.. }", &tree, text)
         );
+    }
+
+    #[test]
+    fn test_ellipses() {
+        let text = "{ a; b; c; }";
+        let tree = super::parse(language(), text);
+        assert_eq!(
+            Some(HashMap::from([(
+                Metavar("x".to_string()),
+                HashSet::from(["a"])
+            )])),
+            matches("{ $x; $.. }", &tree, text)
+        );
+
+        // let text = "{ a; b; c + d; }";
+        // let tree = super::parse(language(), text);
+        // assert_eq!(
+        //     Some(HashMap::from([
+        //         (Metavar("x".to_string()), HashSet::from(["c"])),
+        //         (Metavar("y".to_string()), HashSet::from(["d"]))
+        //     ])),
+        //     matches("{ $.. $x + $y; }", &tree, text)
+        // );
     }
 
     #[test]
