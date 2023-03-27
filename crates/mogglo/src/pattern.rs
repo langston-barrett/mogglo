@@ -79,8 +79,22 @@ impl<'tree> Goal<'tree> {
         }
     }
 
+    fn _next_named_sibling(&self) -> Option<Self> {
+        self.node.next_sibling().map(|node| Self {
+            node,
+            text: self.text,
+        })
+    }
+
     fn next_sibling(&self) -> Option<Self> {
         self.node.next_sibling().map(|node| Self {
+            node,
+            text: self.text,
+        })
+    }
+
+    fn parent(&self) -> Option<Self> {
+        self.node.parent().map(|node| Self {
             node,
             text: self.text,
         })
@@ -291,16 +305,38 @@ impl Pattern {
             let mut goal_child = goal.child(0);
             let mut candidate_child = candidate.child(0);
             loop {
+                // eprintln!(
+                //     "MATCHING {} WITH {}",
+                //     goal_child.as_str(),
+                //     candidate_child.as_str()
+                // );
                 if let Some(FindExpr::Ellipsis) =
                     self.exprs.get(&TmpVar(goal_child.as_str().to_string()))
                 {
-                    if let Some(next) = goal_child.next_sibling() {
+                    if let Some(mut next) = goal_child.next_sibling() {
+                        // HACK: Make ellipses work nicely in semicolon-
+                        // delimited languages...
+                        while next.as_str().trim() == ";" {
+                            if let Some(next2) = next.next_sibling() {
+                                next = next2;
+                            } else if let Some(p) = next.parent() {
+                                if let Some(next2) = p.next_sibling() {
+                                    next = next2
+                                } else {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+
                         // Keep consuming nodes until the next child of the goal matches
                         if let Some(m) =
                             self.match_node_internal(lua, env.clone(), next, candidate_child)
                         {
                             env.extend(m.env);
                             goal_child = next;
+
                             // TODO: candidate_child will be matched again on
                             // the next iteration...
                             continue;
@@ -892,7 +928,7 @@ mod tests {
         //         (Metavar("x".to_string()), HashSet::from(["c"])),
         //         (Metavar("y".to_string()), HashSet::from(["d"]))
         //     ])),
-        //     matches("{ $.. $x + $y; }", &tree, text)
+        //     matches("{ $..; $x + $y; }", &tree, text)
         // );
     }
 
