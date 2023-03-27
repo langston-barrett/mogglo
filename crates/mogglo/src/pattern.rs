@@ -5,7 +5,7 @@ use tree_sitter::{Language, Node, Tree};
 
 use crate::{
     env::{Env, Metavar},
-    lua::{eval_lua, eval_lua_scope, LuaData, LuaNode},
+    lua::{eval_lua, eval_lua_scope, node::LuaNode, LuaData},
 };
 
 pub(crate) fn parse(language: Language, code: &str) -> Tree {
@@ -426,7 +426,6 @@ impl Pattern {
                         let globals = lua_ctx.globals();
                         globals.set("focus", LuaNode::new(candidate.node, candidate.text))?;
                         globals.set("t", candidate.as_str())?;
-                        globals.set("k", candidate.node.kind())?;
                         globals.set(
                             "bind",
                             scope.create_function_mut(|_, m: String| {

@@ -64,10 +64,6 @@ that contain the letter `x`:
 let ${{string.find(t, "x")}} = $_;
 ```
 
-(P) The `k` variable stores the *kind* of the node being matched against, where
-the various node kinds are determined by the relevant tree-sitter grammar. You
-can print all of the node kinds in the code with this pattern: `${{print(k)}}`.
-
 (A) All other metavariables are bound to globals; the pattern author is
 responsible for not clobbering other important globals.
 
@@ -121,6 +117,23 @@ Functions:
   - 1st argument: Regular expression
   - 2nd argument: String to be matched
   - Returns: Whether the regex matched the string
+
+### Nodes
+
+In addition to the "textual" API given by the `t` variable, Lua code has
+access to a "structured" API for AST nodes. The type of node objects is denoted
+`Node`. The "current node" is stored in the global `focus`.
+
+`Node` methods:
+
+- `child(int) -> Option<Node>`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.child)
+- `child_count() -> int`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.child_count)
+- `kind() -> String`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.kind)
+- `parent() -> Option<Node>`:
+  [Upstream docs](https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.parent)
 
 ### State and evaluation order
 
