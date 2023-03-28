@@ -49,6 +49,7 @@ impl FindExpr {
 pub struct Pattern {
     exprs: HashMap<TmpVar, FindExpr>,
     lang: Language,
+    root_id: usize,
     text: String,
     tree: Tree,
     r#where: Vec<LuaCode>,
@@ -123,7 +124,7 @@ impl<'tree> Candidate<'tree> {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Match<'tree> {
     pub(crate) env: Env<'tree>,
-    pub(crate) root: Node<'tree>,
+    pub root: Node<'tree>,
 }
 
 impl Pattern {
@@ -132,7 +133,12 @@ impl Pattern {
     }
 
     // TODO: Disallow anything after ellipses
-    fn parse_from(lang: Language, pat: String, mut vars: usize) -> Pattern {
+    fn parse_from(
+        lang: Language,
+        pat: String,
+        mut vars: usize,
+        unwrap_until: Option<&str>,
+    ) -> Pattern {
         let mut peek = pat.chars().peekable();
         let mut nest = 0;
         let mut code = String::new();
@@ -207,6 +213,8 @@ impl Pattern {
         // of a program). When parsing the pattern fails, we try wrapping the
         // pattern in braces or ending it with a semicolon, and then unwrapping
         // it into an expression when transforming it into a goal.
+        //
+        // Weggli appears to work similarly by default.
         let mut tree = parse(lang, &text);
         if tree.root_node().has_error() {
             text = format!("{{ {text} }}");
@@ -219,17 +227,35 @@ impl Pattern {
                 }
             }
         }
+        let mut root = tree.root_node();
+        // Get rid of top-level "program" node
+        if root.child_count() == 1 {
+            root = root.child(0).unwrap();
+        }
+        // See NOTE[expression-hack]
+        while root.named_child_count() == 1 {
+            if Some(root.kind()) == unwrap_until {
+                break;
+            }
+            root = root.named_child(0).unwrap();
+        }
+
         Self {
             exprs,
             lang,
+            root_id: root.id(),
             text,
             tree,
             r#where: Vec::new(),
         }
     }
 
+    pub fn parse_kind(lang: Language, pat: String, kind: &str) -> Self {
+        Self::parse_from(lang, pat, 0, Some(kind))
+    }
+
     pub fn parse(lang: Language, pat: String) -> Self {
-        Self::parse_from(lang, pat, 0)
+        Self::parse_from(lang, pat, 0, None)
     }
 
     fn match_leaf_node(goal: Goal, candidate: Candidate) -> bool {
@@ -396,7 +422,7 @@ impl Pattern {
                         globals.set(
                             "match",
                             scope.create_function(|_, p: String| {
-                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len());
+                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len(), None);
                                 Ok(pat
                                     .match_node_internal(lua, env.clone(), pat.to_goal(), candidate)
                                     .is_some())
@@ -406,7 +432,7 @@ impl Pattern {
                         globals.set(
                             "rec",
                             scope.create_function(|_, p: String| {
-                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len());
+                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len(), None);
                                 Ok(!pat
                                     .matches_internal(
                                         candidate.text,
@@ -535,13 +561,14 @@ impl Pattern {
 
     fn to_goal(&self) -> Goal {
         let mut goal = self.tree.root_node();
-        // Get rid of top-level "program" node
-        if goal.child_count() == 1 {
-            goal = goal.child(0).unwrap();
-        }
         // See NOTE[expression-hack]
-        while goal.named_child_count() == 1 {
-            goal = goal.named_child(0).unwrap();
+        while goal.id() != self.root_id {
+            if goal.child_count() == 1 {
+                goal = goal.child(0).unwrap();
+            } else {
+                debug_assert_eq!(goal.named_child_count(), 1);
+                goal = goal.named_child(0).unwrap();
+            }
         }
         Goal {
             node: goal,
