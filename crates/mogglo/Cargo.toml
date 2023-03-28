@@ -15,7 +15,7 @@ tree-sitter-rust = "0.20"
 
 [dependencies]
 anyhow = { version = "1", optional = true }
-ariadne = "0.2"
+ariadne = { version = "0.2", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 num_cpus = { version = "1", optional = true }
 regex = "1"
@@ -25,4 +25,4 @@ tree-sitter-edit = "0.1"
 
 [features]
 default = []
-cli = ["dep:anyhow", "dep:clap", "dep:num_cpus"]
+cli = ["dep:anyhow", "dep:ariadne", "dep:clap", "dep:num_cpus"]
