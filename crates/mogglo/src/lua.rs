@@ -8,6 +8,7 @@ use crate::{
 };
 
 pub(crate) mod node;
+pub(crate) mod pattern;
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct LuaData<'a> {

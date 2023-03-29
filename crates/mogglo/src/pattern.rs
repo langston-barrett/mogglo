@@ -5,7 +5,7 @@ use tree_sitter::{Language, Node, Tree};
 
 use crate::{
     env::{Env, Metavar},
-    lua::{eval_lua, eval_lua_scope, node::LuaNode, LuaData},
+    lua::{eval_lua, eval_lua_scope, node::LuaNode, pattern::LuaPattern, LuaData},
     node_types::NodeTypes,
 };
 
@@ -46,7 +46,7 @@ impl FindExpr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Pattern<'nts> {
     exprs: HashMap<TmpVar, FindExpr>,
     lang: Language,
@@ -444,6 +444,38 @@ impl<'nts> Pattern<'nts> {
                                     .is_some())
                             })?,
                         )?;
+
+                        globals.set(
+                            "pat",
+                            scope.create_function(|_, p: String| {
+                                let pat = Pattern::parse_from(
+                                    self.lang,
+                                    self.node_types,
+                                    p,
+                                    self.exprs.len(),
+                                    None,
+                                );
+                                Ok(LuaPattern::new(pat))
+                            })?,
+                        )?;
+
+                        globals.set(
+                            "pmatch",
+                            scope.create_function(|_, (p, n): (LuaPattern, LuaNode)| {
+                                Ok(p.0
+                                    .match_node_internal(
+                                        lua,
+                                        env.clone(),
+                                        p.0.to_goal(),
+                                        Candidate {
+                                            node: n.node,
+                                            text: n.text,
+                                        },
+                                    )
+                                    .is_some())
+                            })?,
+                        )?;
+
                         // TODO: Option to export metavariables
                         globals.set(
                             "rec",
@@ -532,6 +564,8 @@ impl<'nts> Pattern<'nts> {
         }
     }
 
+    // TODO: Only named children
+    // TODO: Minimum match size
     fn matches_internal<'tree>(
         &self,
         text: &'tree str,
