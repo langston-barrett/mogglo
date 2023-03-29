@@ -11,6 +11,7 @@ homepage = "https://github.com/langston-barrett/mogglo"
 repository = "https://github.com/langston-barrett/mogglo"
 
 [dev-dependencies]
+lazy_static = "1"
 tree-sitter-rust = "0.20"
 
 [dependencies]
@@ -20,6 +21,8 @@ clap = { version = "4", features = ["derive"], optional = true }
 num_cpus = { version = "1", optional = true }
 regex = "1"
 rlua = { version = "0.19", features = ["lua-no-oslib"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 tree-sitter = "0.20"
 tree-sitter-edit = "0.1"
 

@@ -6,6 +6,7 @@ use tree_sitter::{Language, Node, Tree};
 use crate::{
     env::{Env, Metavar},
     lua::{eval_lua, eval_lua_scope, node::LuaNode, LuaData},
+    node_types::NodeTypes,
 };
 
 pub(crate) fn parse(language: Language, code: &str) -> Tree {
@@ -46,9 +47,10 @@ impl FindExpr {
 }
 
 #[derive(Debug)]
-pub struct Pattern {
+pub struct Pattern<'nts> {
     exprs: HashMap<TmpVar, FindExpr>,
     lang: Language,
+    node_types: &'nts NodeTypes<'nts>,
     root_id: usize,
     text: String,
     tree: Tree,
@@ -127,7 +129,7 @@ pub struct Match<'tree> {
     pub root: Node<'tree>,
 }
 
-impl Pattern {
+impl<'nts> Pattern<'nts> {
     fn meta(i: usize) -> TmpVar {
         TmpVar(format!("mogglo_tmp_var_{i}"))
     }
@@ -135,10 +137,11 @@ impl Pattern {
     // TODO: Disallow anything after ellipses
     fn parse_from(
         lang: Language,
+        node_types: &'nts NodeTypes<'nts>,
         pat: String,
         mut vars: usize,
         unwrap_until: Option<&str>,
-    ) -> Pattern {
+    ) -> Self {
         let mut peek = pat.chars().peekable();
         let mut nest = 0;
         let mut code = String::new();
@@ -243,6 +246,7 @@ impl Pattern {
         Self {
             exprs,
             lang,
+            node_types,
             root_id: root.id(),
             text,
             tree,
@@ -250,12 +254,17 @@ impl Pattern {
         }
     }
 
-    pub fn parse_kind(lang: Language, pat: String, kind: &str) -> Self {
-        Self::parse_from(lang, pat, 0, Some(kind))
+    pub fn parse_kind(
+        lang: Language,
+        node_types: &'nts NodeTypes<'nts>,
+        pat: String,
+        kind: &str,
+    ) -> Self {
+        Self::parse_from(lang, node_types, pat, 0, Some(kind))
     }
 
-    pub fn parse(lang: Language, pat: String) -> Self {
-        Self::parse_from(lang, pat, 0, None)
+    pub fn parse(lang: Language, node_types: &'nts NodeTypes<'nts>, pat: String) -> Self {
+        Self::parse_from(lang, node_types, pat, 0, None)
     }
 
     fn match_leaf_node(goal: Goal, candidate: Candidate) -> bool {
@@ -422,7 +431,13 @@ impl Pattern {
                         globals.set(
                             "match",
                             scope.create_function(|_, p: String| {
-                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len(), None);
+                                let pat = Pattern::parse_from(
+                                    self.lang,
+                                    self.node_types,
+                                    p,
+                                    self.exprs.len(),
+                                    None,
+                                );
                                 Ok(pat
                                     .match_node_internal(lua, env.clone(), pat.to_goal(), candidate)
                                     .is_some())
@@ -432,7 +447,13 @@ impl Pattern {
                         globals.set(
                             "rec",
                             scope.create_function(|_, p: String| {
-                                let pat = Pattern::parse_from(self.lang, p, self.exprs.len(), None);
+                                let pat = Pattern::parse_from(
+                                    self.lang,
+                                    self.node_types,
+                                    p,
+                                    self.exprs.len(),
+                                    None,
+                                );
                                 Ok(!pat
                                     .matches_internal(
                                         candidate.text,
@@ -644,10 +665,17 @@ mod tests {
     use tree_sitter::Tree;
     use tree_sitter_rust::language;
 
+    use crate::node_types::NodeTypes;
+
     use super::{Candidate, Env, FindExpr, LuaCode, Match, Metavar, Pattern};
 
+    lazy_static::lazy_static! {
+        /// This is an example for using doc comment attributes
+        static ref NODE_TYPES: NodeTypes<'static> = NodeTypes::new(tree_sitter_rust::NODE_TYPES).unwrap();
+    }
+
     fn pat(s: &str) -> Pattern {
-        Pattern::parse(language(), s.to_string())
+        Pattern::parse(language(), &NODE_TYPES, s.to_string())
     }
 
     fn match_one<'tree>(s: &str, tree: &'tree Tree, text: &'tree str) -> Option<Env<'tree>> {
@@ -655,7 +683,7 @@ mod tests {
             node: tree.root_node(),
             text,
         };
-        Pattern::parse(language(), s.to_string())
+        Pattern::parse(language(), &NODE_TYPES, s.to_string())
             .match_node(Env::default(), candidate)
             .map(|m| m.env)
     }
@@ -680,7 +708,13 @@ mod tests {
     }
 
     fn match_all<'tree>(s: &str, tree: &'tree Tree, text: &'tree str) -> Vec<Match<'tree>> {
-        Pattern::parse(language(), s.to_string()).matches(tree, text, &Env::default(), false, None)
+        Pattern::parse(language(), &NODE_TYPES, s.to_string()).matches(
+            tree,
+            text,
+            &Env::default(),
+            false,
+            None,
+        )
     }
 
     fn all_matches<'tree>(
@@ -713,10 +747,10 @@ mod tests {
             node: tree.root_node(),
             text,
         };
-        let m = Pattern::parse(language(), find.to_string())
+        let m = Pattern::parse(language(), &NODE_TYPES, find.to_string())
             .match_node(Env::default(), candidate)
             .unwrap();
-        let p = Pattern::parse(language(), replace.to_string());
+        let p = Pattern::parse(language(), &NODE_TYPES, replace.to_string());
         p.replace(vec![m], text.to_string())
     }
 

@@ -12,6 +12,7 @@ use tree_sitter::{Language, Tree};
 
 use crate::{
     env::Env,
+    node_types::NodeTypes,
     pattern::{LuaCode, Pattern},
 };
 
@@ -166,10 +167,12 @@ fn match_report(
     Ok(())
 }
 
-pub fn main(language: Language) -> Result<()> {
+pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()> {
     let args = Args::parse();
+    let node_types = NodeTypes::new(node_types_json_str)
+        .expect("Internal error: failed to parse node_types.json");
 
-    let mut pat = Pattern::parse(language, args.pattern.clone());
+    let mut pat = Pattern::parse(language, &node_types, args.pattern.clone());
     pat.r#where(&mut args.r#where.into_iter().map(LuaCode));
 
     // TODO: Parallelize
@@ -187,7 +190,7 @@ pub fn main(language: Language) -> Result<()> {
         for m in pat.matches(&tree, &text, &Env::default(), args.recursive, args.limit) {
             if let Some(replace) = &args.replace {
                 if args.only_matching {
-                    let p = Pattern::parse(language, replace.to_string());
+                    let p = Pattern::parse(language, &node_types, replace.to_string());
                     println!("{}", p.replace(vec![m], text.to_string()));
                     continue;
                 }
@@ -205,7 +208,7 @@ pub fn main(language: Language) -> Result<()> {
                     args.detail,
                     "Match",
                 )?;
-                let p = Pattern::parse(language, replace.to_string());
+                let p = Pattern::parse(language, &node_types, replace.to_string());
                 // TODO: Computes replacement twice...
                 let replacement = p.replacement(&m, &text);
                 let replaced = p.replace(vec![m.clone()], text.clone());
