@@ -47,3 +47,4 @@ See [the documentation](./doc) for more details!
 [crates-io]: https://crates.io/
 [releases]: https://github.com/langston-barrett/mogglo/releases
 [rustup]: https://rustup.rs/
+[unroll]: https://en.wikipedia.org/wiki/Loop_unrolling
