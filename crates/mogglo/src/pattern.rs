@@ -404,6 +404,7 @@ impl<'nts> Pattern<'nts> {
             FindExpr::Lua(LuaCode(code)) => {
                 let data = LuaData {
                     env: &env,
+                    node_types: self.node_types,
                     text: candidate.text,
                 };
                 let mut binds = Env::default();
@@ -512,6 +513,7 @@ impl<'nts> Pattern<'nts> {
             for LuaCode(c) in &self.r#where {
                 let data = LuaData {
                     env: &m.env,
+                    node_types: self.node_types,
                     text: candidate.text,
                 };
                 match eval_lua::<bool>(&lua, c, &data) {
@@ -630,7 +632,11 @@ impl<'nts> Pattern<'nts> {
                 },
                 FindExpr::Lua(LuaCode(code)) => {
                     let lua = Lua::new();
-                    let data = LuaData { env: &m.env, text };
+                    let data = LuaData {
+                        env: &m.env,
+                        node_types: self.node_types,
+                        text,
+                    };
                     match eval_lua::<String>(&lua, code, &data) {
                         Ok(evaled) => replacement = replacement.replace(&tvar.0, &evaled),
                         Err(e) => {

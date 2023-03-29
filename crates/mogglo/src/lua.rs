@@ -2,13 +2,17 @@ use regex::Regex;
 use rlua::{prelude::LuaError, Lua};
 use tree_sitter::Node;
 
-use crate::env::{Env, Metavar};
+use crate::{
+    env::{Env, Metavar},
+    node_types::NodeTypes,
+};
 
 pub(crate) mod node;
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct LuaData<'a> {
     pub(crate) env: &'a Env<'a>,
+    pub(crate) node_types: &'a NodeTypes<'a>,
     pub(crate) text: &'a str,
 }
 
@@ -37,6 +41,34 @@ where
             globals.set(mvar.0.clone(), data.node_text(v))?;
         }
     }
+
+    globals.set(
+        "is_child_of",
+        scope.create_function(|_, (c, p): (String, String)| {
+            Ok(data.node_types.is_child_of(&c, &p))
+        })?,
+    )?;
+
+    globals.set(
+        "is_descendant_of",
+        scope.create_function(|_, (c, p): (String, String)| {
+            Ok(data.node_types.is_descendant_of(&c, &p))
+        })?,
+    )?;
+
+    globals.set(
+        "is_parent_of",
+        scope.create_function(|_, (p, c): (String, String)| {
+            Ok(data.node_types.is_parent_of(&p, &c))
+        })?,
+    )?;
+
+    globals.set(
+        "is_ancestor_of",
+        scope.create_function(|_, (p, c): (String, String)| {
+            Ok(data.node_types.is_ancestor_of(&p, &c))
+        })?,
+    )?;
 
     globals.set(
         "meta",

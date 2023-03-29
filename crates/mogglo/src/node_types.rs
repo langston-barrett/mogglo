@@ -43,7 +43,7 @@ pub struct Subtype<'a> {
 }
 
 #[allow(dead_code)]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct NodeTypes<'a> {
     parents: HashMap<Cow<'a, str>, HashSet<Cow<'a, str>>>,
     children: HashMap<Cow<'a, str>, HashSet<Cow<'a, str>>>,
@@ -68,16 +68,30 @@ impl<'a> NodeTypes<'a> {
         Ok(NodeTypes { parents, children })
     }
 
-    pub(crate) fn _is_child(&self, parent: &str, child: &str) -> bool {
+    pub(crate) fn is_child_of(&self, child: &str, parent: &str) -> bool {
         self.children
             .get(parent)
             .map_or(false, |cs| cs.contains(child))
     }
 
-    pub(crate) fn _is_parent(&self, child: &str, parent: &str) -> bool {
+    pub(crate) fn is_descendant_of(&self, desc: &str, ansc: &str) -> bool {
+        ansc == desc
+            || self.children.get(ansc).map_or(false, |cs| {
+                cs.contains(desc) || cs.iter().any(|c| self.is_descendant_of(desc, c))
+            })
+    }
+
+    pub(crate) fn is_parent_of(&self, parent: &str, child: &str) -> bool {
         self.parents
             .get(child)
             .map_or(false, |ps| ps.contains(parent))
+    }
+
+    pub(crate) fn is_ancestor_of(&self, ansc: &str, desc: &str) -> bool {
+        ansc == desc
+            || self.children.get(ansc).map_or(false, |cs| {
+                cs.contains(desc) || cs.iter().any(|c| self.is_descendant_of(c, desc))
+            })
     }
 }
 
@@ -88,8 +102,10 @@ mod tests {
     #[test]
     fn test_optional() {
         let nt = NodeTypes::new(tree_sitter_rust::NODE_TYPES).unwrap();
-        assert!(nt._is_child("_expression", "array_expression"));
-        assert!(nt._is_parent("array_expression", "_expression"));
-        assert!(!nt._is_child("_expression", "empty_statement"));
+        assert!(nt.is_child_of("array_expression", "_expression"));
+        assert!(nt.is_descendant_of("array_expression", "_expression"));
+        assert!(nt.is_parent_of("_expression", "array_expression"));
+        assert!(!nt.is_child_of("_expression", "empty_statement"));
+        assert!(!nt.is_child_of("empty_statement", "_expression"));
     }
 }
