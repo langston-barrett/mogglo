@@ -294,6 +294,10 @@ See <a href="./api.html">the API reference</a> for details.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
 <h2 id="from-a-release"><a class="header" href="#from-a-release">From a release</a></h2>
 <p>Statically-linked Linux binaries are available on the <a href="https://github.com/langston-barrett/mogglo/releases">releases page</a>.</p>
+<p>You can download binaries with <code>curl</code> like so (replace <code>X.Y.Z</code> with a real
+version number and <code>LANG</code> with a supported language):</p>
+<pre><code class="language-sh">curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
+</code></pre>
 <h2 id="from-cratesio"><a class="header" href="#from-cratesio">From crates.io</a></h2>
 <p>You can build a released version from <a href="https://crates.io/">crates.io</a>. You'll need the
 Rust compiler and the <a href="https://doc.rust-lang.org/cargo/">Cargo</a> build tool. <a href="https://rustup.rs/">rustup</a> makes it very
