@@ -23,18 +23,23 @@ You can find binaries in `target/release`. Run tests with `cargo test`.
 
 ## Docs
 
-HTML documentation can be built with `mdbook`:
+HTML documentation can be built with [mdBook][mdbook]:
 
 ```sh
 cd doc
 mdbook build
 ```
 
+[mdbook]: https://rust-lang.github.io/mdBook/
+
 ## Test
 
-Run end-to-end tests with `lit` and `FileCheck `:
+Run end-to-end tests with [`lit`][lit] and [`FileCheck`][filecheck]:
 
 ```sh
 cargo build
 lit --path=$PWD/test/bin --path=$PWD/target/debug test/
 ```
+
+[filecheck]: https://www.llvm.org/docs/CommandGuide/FileCheck.html
+[lit]: https://www.llvm.org/docs/CommandGuide/lit.html
