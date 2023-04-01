@@ -248,7 +248,7 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "mogglo"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -266,7 +266,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-c"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -275,7 +275,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-cpp"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -284,7 +284,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-css"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -293,7 +293,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-haskell"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -302,7 +302,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-html"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -311,7 +311,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-java"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -320,7 +320,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-javascript"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -329,7 +329,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-python"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -338,7 +338,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-ruby"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -347,7 +347,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-rust"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -356,7 +356,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-swift"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
@@ -365,7 +365,7 @@ dependencies = [
 
 [[package]]
 name = "mogglo-typescript"
-version = "0.1.1-rc.1"
+version = "0.1.1-rc.2"
 dependencies = [
  "anyhow",
  "mogglo",
