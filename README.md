@@ -41,8 +41,9 @@ This transformation demonstrates the power of using Lua: it can't be done with
 regular expression substitutions and would be very difficult with other codemod
 tools.
 
-See [the documentation](./doc) for more details!
+See [the documentation][doc] for more details!
 
+[doc]: https://langston-barrett.github.io/mogglo/
 [cargo]: https://doc.rust-lang.org/cargo/
 [crates-io]: https://crates.io/
 [releases]: https://github.com/langston-barrett/mogglo/releases
