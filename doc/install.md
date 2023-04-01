@@ -4,6 +4,12 @@
 
 Statically-linked Linux binaries are available on the [releases page][releases].
 
+You can download binaries with `curl` like so (replace `X.Y.Z` with a real
+version number and `LANG` with a supported language):
+```sh
+curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
+```
+
 ## From crates.io
 
 You can build a released version from [crates.io][crates-io]. You'll need the
