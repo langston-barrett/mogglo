@@ -31,9 +31,9 @@ cargo install mogglo-<LANG>
 This will automatically download the source from [crates.io], build it, and
 install it in Cargo's global binary directory (`~/.cargo/bin/` by default).
 
-### From the latest version on Github
+### From the latest unreleased version on Github
 
-To use the very latest unreleased version, run:
+To build and install the very latest unreleased version, run:
 
 ```sh
 cargo install --git https://github.com/langston-barrett/mogglo.git mogglo-LANG
