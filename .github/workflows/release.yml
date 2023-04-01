@@ -50,7 +50,7 @@ jobs:
     needs: release
     strategy:
       matrix:
-        build: [linux-x86_64-gnu, linux-x86_64-musl, macos-x86_64, windows-x86_64-msvc]
+        build: [linux-x86_64-gnu, linux-x86_64-musl, macos-x86_64]
         include:
           - build: linux-x86_64-gnu
             os: ubuntu-latest
@@ -72,10 +72,10 @@ jobs:
           #   os: windows-latest
           #   rust: nightly-x86_64-gnu
           #   target: x86_64-pc-windows-gnu
-          - build: windows-x86_64-msvc
-            os: windows-latest
-            rust: nightly-x86_64-msvc
-            target: x86_64-pc-windows-msvc
+          # - build: windows-x86_64-msvc
+          #   os: windows-latest
+          #   rust: nightly-x86_64-msvc
+          #   target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
