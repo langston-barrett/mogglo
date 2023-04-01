@@ -1,6 +1,6 @@
 [package]
 name = "mogglo-rust"
-version = "0.1.1-rc.2"
+version = "0.1.1-rc.3"
 edition = "2021"
 description = "Multi-language AST-based code search and rewriting"
 keywords = ["ast", "codemod", "code-search", "grep", "tree-sitter"]
@@ -12,5 +12,5 @@ repository = "https://github.com/langston-barrett/mogglo"
 
 [dependencies]
 anyhow = "1"
-mogglo = { version = "0.1.1-rc.2", features = ["cli"], path = "../mogglo" }
+mogglo = { version = "0.1.1-rc.3", features = ["cli"], path = "../mogglo" }
 tree-sitter-rust = "0.20"

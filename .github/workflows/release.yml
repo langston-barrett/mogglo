@@ -50,7 +50,7 @@ jobs:
     needs: release
     strategy:
       matrix:
-        build: [linux-x86_64-gnu, linux-x86_64-musl, macos-x86_64, windows-x86_64-gnu, windows-x86_64-msvc]
+        build: [linux-x86_64-gnu, linux-x86_64-musl, macos-x86_64, windows-x86_64-msvc]
         include:
           - build: linux-x86_64-gnu
             os: ubuntu-latest
@@ -65,10 +65,13 @@ jobs:
             os: macos-latest
             rust: nightly
             target: x86_64-apple-darwin
-          - build: windows-x86_64-gnu
-            os: windows-latest
-            rust: nightly-x86_64-gnu
-            target: x86_64-pc-windows-gnu
+          # TODO(lb):
+          # Error: Error undefined: Artifact pattern :mogglo-c_x86_64-pc-windows-gnu did not match any files
+          # https://github.com/langston-barrett/mogglo/actions/runs/4584974511/jobs/8096940552
+          # - build: windows-x86_64-gnu
+          #   os: windows-latest
+          #   rust: nightly-x86_64-gnu
+          #   target: x86_64-pc-windows-gnu
           - build: windows-x86_64-msvc
             os: windows-latest
             rust: nightly-x86_64-msvc
