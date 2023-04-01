@@ -4,9 +4,9 @@
 
 # User documentation
 
-- [Contributing](./contributing.md)
-- [Guide](./guide.md)
 - [Installation](./install.md)
+- [Guide](./guide.md)
+- [Contributing](./contributing.md)
 
 # Reference
 

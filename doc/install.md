@@ -1,8 +1,10 @@
 # Installation
 
-## From a release
+## Pre-compiled binaries
 
 Statically-linked Linux binaries are available on the [releases page][releases].
+
+### Fetching binaries with cURL
 
 You can download binaries with `curl` like so (replace `X.Y.Z` with a real
 version number and `LANG` with a supported language):
@@ -10,24 +12,42 @@ version number and `LANG` with a supported language):
 curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
 ```
 
-## From crates.io
+## Build from source
 
-You can build a released version from [crates.io][crates-io]. You'll need the
-Rust compiler and the [Cargo][cargo] build tool. [rustup][rustup] makes it very
-easy to obtain these. Then, to install Mogglo for the language `<LANG>`,
-run:
+To install from source, you'll need to install Rust and [Cargo][cargo]. Follow
+the instructions on the [Rust installation page][install-rust].
 
-```
+[install-rust]: https://www.rust-lang.org/tools/install
+
+### From a release on crates.io
+
+You can build a released version from [crates.io]. To install the latest
+release of Mogglo for the language `<LANG>`, run:
+
+```sh
 cargo install mogglo-<LANG>
 ```
 
-This will install binaries in `~/.cargo/bin` by default.
+This will automatically download the source from [crates.io], build it, and
+install it in Cargo's global binary directory (`~/.cargo/bin/` by default).
 
-## From source
+### From the latest version on Github
+
+To use the very latest unreleased version, run:
+
+```sh
+cargo install --git https://github.com/langston-barrett/mogglo.git mogglo-LANG
+```
+
+### From a local checkout
 
 See the [developer's guide](dev.md).
 
+### Uninstalling
+
+To uninstall, run `cargo uninstall mogglo-<LANG>`.
+
 [cargo]: https://doc.rust-lang.org/cargo/
-[crates-io]: https://crates.io/
+[crates.io]: https://crates.io/
 [releases]: https://github.com/langston-barrett/mogglo/releases
 [rustup]: https://rustup.rs/
