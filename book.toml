@@ -4,3 +4,7 @@ language = "en"
 multilingual = false
 src = "."
 title = "Mogglo"
+
+[output.html]
+git-repository-url = "https://github.com/langston-barrett/mogglo/tree/main/doc"
+edit-url-template = "https://github.com/langston-barrett/mogglo/edit/main/doc/{path}"

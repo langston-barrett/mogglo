@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">1.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">2.</strong> Guide</a></li><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">3.</strong> Installation</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">5.</strong> Development</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">2.</strong> Guide</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">3.</strong> Contributing</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">5.</strong> Development</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -118,7 +118,10 @@
                                                 <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                                                                        
+                                                                        <a href="https://github.com/langston-barrett/mogglo/tree/main/doc" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                
                     </div>
                 </div>
 
@@ -232,16 +235,32 @@ tend to be more polished but less general than Mogglo.</p>
 <li><a href="https://github.com/facebookincubator/retrie">retrie</a></li>
 <li><a href="https://github.com/weggli-rs/weggli">weggli</a></li>
 </ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
-<p>Thank you for your interest in Mogglo! We welcome and appreciate all kinds of
-contributions. Please feel free to file and issue or open a pull request.</p>
-<p>You may want to take a look at:</p>
-<ul>
-<li>The <a href="dev.html">developer guide</a></li>
-<li>The <a href="https://github.com/langston-barrett/mogglo/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22">issues labeled &quot;good first issue&quot;</a></li>
-<li>The <a href="https://github.com/langston-barrett/mogglo/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22">issues labeled &quot;help wanted&quot;</a></li>
-</ul>
-<p>If you have questions, please ask them on the <a href="https://github.com/langston-barrett/mogglo/discussions">discussions page</a>!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<h2 id="pre-compiled-binaries"><a class="header" href="#pre-compiled-binaries">Pre-compiled binaries</a></h2>
+<p>Statically-linked Linux binaries are available on the <a href="https://github.com/langston-barrett/mogglo/releases">releases page</a>.</p>
+<h3 id="fetching-binaries-with-curl"><a class="header" href="#fetching-binaries-with-curl">Fetching binaries with cURL</a></h3>
+<p>You can download binaries with <code>curl</code> like so (replace <code>X.Y.Z</code> with a real
+version number and <code>LANG</code> with a supported language):</p>
+<pre><code class="language-sh">curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
+</code></pre>
+<h2 id="build-from-source"><a class="header" href="#build-from-source">Build from source</a></h2>
+<p>To install from source, you'll need to install Rust and <a href="https://doc.rust-lang.org/cargo/">Cargo</a>. Follow
+the instructions on the <a href="https://www.rust-lang.org/tools/install">Rust installation page</a>.</p>
+<h3 id="from-a-release-on-cratesio"><a class="header" href="#from-a-release-on-cratesio">From a release on crates.io</a></h3>
+<p>You can build a released version from <a href="https://crates.io/">crates.io</a>. To install the latest
+release of Mogglo for the language <code>&lt;LANG&gt;</code>, run:</p>
+<pre><code class="language-sh">cargo install mogglo-&lt;LANG&gt;
+</code></pre>
+<p>This will automatically download the source from <a href="https://crates.io/">crates.io</a>, build it, and
+install it in Cargo's global binary directory (<code>~/.cargo/bin/</code> by default).</p>
+<h3 id="from-the-latest-version-on-github"><a class="header" href="#from-the-latest-version-on-github">From the latest version on Github</a></h3>
+<p>To use the very latest unreleased version, run:</p>
+<pre><code class="language-sh">cargo install --git https://github.com/langston-barrett/mogglo.git mogglo-LANG
+</code></pre>
+<h3 id="from-a-local-checkout"><a class="header" href="#from-a-local-checkout">From a local checkout</a></h3>
+<p>See the <a href="dev.html">developer's guide</a>.</p>
+<h3 id="uninstalling"><a class="header" href="#uninstalling">Uninstalling</a></h3>
+<p>To uninstall, run <code>cargo uninstall mogglo-&lt;LANG&gt;</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="guide"><a class="header" href="#guide">Guide</a></h1>
 <p>Mogglo searches for <em>patterns</em> in code. Mogglo patterns consist of code
 augmented with <em>metavariables</em> and embedded Lua code.</p>
@@ -291,23 +310,16 @@ See <a href="./api.html">the API reference</a> for details.</p>
    │                ╰────── Match
 ───╯
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
-<h2 id="from-a-release"><a class="header" href="#from-a-release">From a release</a></h2>
-<p>Statically-linked Linux binaries are available on the <a href="https://github.com/langston-barrett/mogglo/releases">releases page</a>.</p>
-<p>You can download binaries with <code>curl</code> like so (replace <code>X.Y.Z</code> with a real
-version number and <code>LANG</code> with a supported language):</p>
-<pre><code class="language-sh">curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
-</code></pre>
-<h2 id="from-cratesio"><a class="header" href="#from-cratesio">From crates.io</a></h2>
-<p>You can build a released version from <a href="https://crates.io/">crates.io</a>. You'll need the
-Rust compiler and the <a href="https://doc.rust-lang.org/cargo/">Cargo</a> build tool. <a href="https://rustup.rs/">rustup</a> makes it very
-easy to obtain these. Then, to install Mogglo for the language <code>&lt;LANG&gt;</code>,
-run:</p>
-<pre><code>cargo install mogglo-&lt;LANG&gt;
-</code></pre>
-<p>This will install binaries in <code>~/.cargo/bin</code> by default.</p>
-<h2 id="from-source"><a class="header" href="#from-source">From source</a></h2>
-<p>See the <a href="dev.html">developer's guide</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
+<p>Thank you for your interest in Mogglo! We welcome and appreciate all kinds of
+contributions. Please feel free to file and issue or open a pull request.</p>
+<p>You may want to take a look at:</p>
+<ul>
+<li>The <a href="dev.html">developer guide</a></li>
+<li>The <a href="https://github.com/langston-barrett/mogglo/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22">issues labeled &quot;good first issue&quot;</a></li>
+<li>The <a href="https://github.com/langston-barrett/mogglo/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22">issues labeled &quot;help wanted&quot;</a></li>
+</ul>
+<p>If you have questions, please ask them on the <a href="https://github.com/langston-barrett/mogglo/discussions">discussions page</a>!</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="lua-api-reference"><a class="header" href="#lua-api-reference">Lua API reference</a></h1>
 <h2 id="contexts"><a class="header" href="#contexts">Contexts</a></h2>
 <p>Lua code is evaluated in three different contexts:</p>
@@ -445,8 +457,9 @@ the following pattern is functionally equivalent to
 tell when and how many times a given snippet will execute.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="developers-guide"><a class="header" href="#developers-guide">Developer's guide</a></h1>
 <h2 id="build"><a class="header" href="#build">Build</a></h2>
-<p>To build from source, you'll need the Rust compiler and the <a href="https://doc.rust-lang.org/cargo/">Cargo</a> build
-tool. <a href="https://rustup.rs/">rustup</a> makes it very easy to obtain these. Then, get the source:</p>
+<p>To install from source, you'll need to install Rust and <a href="https://doc.rust-lang.org/cargo/">Cargo</a>. Follow
+the instructions on the <a href="https://www.rust-lang.org/tools/install">Rust installation page</a>. Then, get
+the source:</p>
 <pre><code class="language-bash">git clone https://github.com/langston-barrett/mogglo
 cd mogglo
 </code></pre>
@@ -459,6 +472,45 @@ cd mogglo
 <pre><code class="language-sh">cd doc
 mdbook build
 </code></pre>
+<h2 id="release"><a class="header" href="#release">Release</a></h2>
+<ul>
+<li>
+<p>Create branch with a name starting with <code>release</code></p>
+</li>
+<li>
+<p>Update <code>CHANGELOG.md</code></p>
+</li>
+<li>
+<p>Update the version numbers in <code>./crates/**/Cargo.toml</code></p>
+<pre><code class="language-sh">find crates/ -type f -name &quot;*.toml&quot; -0 | \
+  xargs -0 sed -E -i 's/^version = &quot;U.V.W&quot;$/version = &quot;X.Y.Z&quot;/'
+</code></pre>
+</li>
+<li>
+<p>Run <code>cargo build --release</code></p>
+</li>
+<li>
+<p>Commit all changes and push the release branch</p>
+</li>
+<li>
+<p>Check that CI was successful on the release branch</p>
+</li>
+<li>
+<p>Merge the release branch to <code>main</code></p>
+</li>
+<li>
+<p><code>git checkout main &amp;&amp; git pull origin &amp;&amp; git tag -a vX.Y.Z -m vX.Y.Z &amp;&amp; git push --tags</code></p>
+</li>
+<li>
+<p>Verify that the release artifacts work as intended</p>
+</li>
+<li>
+<p>Release the pre-release created by CI</p>
+</li>
+<li>
+<p>Check that the crates were properly uploaded to crates.io</p>
+</li>
+</ul>
 <h2 id="test"><a class="header" href="#test">Test</a></h2>
 <p>Run end-to-end tests with <a href="https://www.llvm.org/docs/CommandGuide/lit.html"><code>lit</code></a> and <a href="https://www.llvm.org/docs/CommandGuide/FileCheck.html"><code>FileCheck</code></a>:</p>
 <pre><code class="language-sh">cargo build

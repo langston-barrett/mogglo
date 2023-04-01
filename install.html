@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">1.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">2.</strong> Guide</a></li><li class="chapter-item expanded "><a href="install.html" class="active"><strong aria-hidden="true">3.</strong> Installation</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">5.</strong> Development</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="install.html" class="active"><strong aria-hidden="true">1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">2.</strong> Guide</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">3.</strong> Contributing</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">5.</strong> Development</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -117,7 +117,13 @@
                                                 <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                                                                        
+                                                                        <a href="https://github.com/langston-barrett/mogglo/tree/main/doc" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                                        <a href="https://github.com/langston-barrett/mogglo/edit/main/doc/./install.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+                        
                     </div>
                 </div>
 
@@ -144,32 +150,41 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
-<h2 id="from-a-release"><a class="header" href="#from-a-release">From a release</a></h2>
+<h2 id="pre-compiled-binaries"><a class="header" href="#pre-compiled-binaries">Pre-compiled binaries</a></h2>
 <p>Statically-linked Linux binaries are available on the <a href="https://github.com/langston-barrett/mogglo/releases">releases page</a>.</p>
+<h3 id="fetching-binaries-with-curl"><a class="header" href="#fetching-binaries-with-curl">Fetching binaries with cURL</a></h3>
 <p>You can download binaries with <code>curl</code> like so (replace <code>X.Y.Z</code> with a real
 version number and <code>LANG</code> with a supported language):</p>
 <pre><code class="language-sh">curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
 </code></pre>
-<h2 id="from-cratesio"><a class="header" href="#from-cratesio">From crates.io</a></h2>
-<p>You can build a released version from <a href="https://crates.io/">crates.io</a>. You'll need the
-Rust compiler and the <a href="https://doc.rust-lang.org/cargo/">Cargo</a> build tool. <a href="https://rustup.rs/">rustup</a> makes it very
-easy to obtain these. Then, to install Mogglo for the language <code>&lt;LANG&gt;</code>,
-run:</p>
-<pre><code>cargo install mogglo-&lt;LANG&gt;
+<h2 id="build-from-source"><a class="header" href="#build-from-source">Build from source</a></h2>
+<p>To install from source, you'll need to install Rust and <a href="https://doc.rust-lang.org/cargo/">Cargo</a>. Follow
+the instructions on the <a href="https://www.rust-lang.org/tools/install">Rust installation page</a>.</p>
+<h3 id="from-a-release-on-cratesio"><a class="header" href="#from-a-release-on-cratesio">From a release on crates.io</a></h3>
+<p>You can build a released version from <a href="https://crates.io/">crates.io</a>. To install the latest
+release of Mogglo for the language <code>&lt;LANG&gt;</code>, run:</p>
+<pre><code class="language-sh">cargo install mogglo-&lt;LANG&gt;
 </code></pre>
-<p>This will install binaries in <code>~/.cargo/bin</code> by default.</p>
-<h2 id="from-source"><a class="header" href="#from-source">From source</a></h2>
+<p>This will automatically download the source from <a href="https://crates.io/">crates.io</a>, build it, and
+install it in Cargo's global binary directory (<code>~/.cargo/bin/</code> by default).</p>
+<h3 id="from-the-latest-version-on-github"><a class="header" href="#from-the-latest-version-on-github">From the latest version on Github</a></h3>
+<p>To use the very latest unreleased version, run:</p>
+<pre><code class="language-sh">cargo install --git https://github.com/langston-barrett/mogglo.git mogglo-LANG
+</code></pre>
+<h3 id="from-a-local-checkout"><a class="header" href="#from-a-local-checkout">From a local checkout</a></h3>
 <p>See the <a href="dev.html">developer's guide</a>.</p>
+<h3 id="uninstalling"><a class="header" href="#uninstalling">Uninstalling</a></h3>
+<p>To uninstall, run <code>cargo uninstall mogglo-&lt;LANG&gt;</code>.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                                                    <a rel="prev" href="guide.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                                    <a rel="prev" href="overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
-                                                    <a rel="next" href="api.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="guide.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -179,11 +194,11 @@ run:</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                                    <a rel="prev" href="guide.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                    <a rel="prev" href="overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
-                                    <a rel="next" href="api.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="guide.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>
