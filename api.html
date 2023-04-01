@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lua API reference - Mogglo</title>
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="favicon.svg">
+                        <link rel="shortcut icon" href="favicon.png">
+                <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+                <link rel="stylesheet" href="css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">1.</strong> Guide</a></li><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html" class="active"><strong aria-hidden="true">3.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">4.</strong> Development</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title">Mogglo</h1>
+
+                    <div class="right-buttons">
+                                                <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lua-api-reference"><a class="header" href="#lua-api-reference">Lua API reference</a></h1>
+<h2 id="contexts"><a class="header" href="#contexts">Contexts</a></h2>
+<p>Lua code is evaluated in three different contexts:</p>
+<ul>
+<li>Patterns: Lua code embedded in <code>${{}}</code> when <em>matching</em> code</li>
+<li>Replacments: Lua code embedded in <code>${{}}</code> when <em>replacing</em> code</li>
+<li>Where clauses: Lua code passed to <code>--where</code>.</li>
+</ul>
+<p>The value produced by code evaluated in patterns and where clauses is treated
+as a boolean. If code in a pattern evaluates to <code>false</code> or <code>nil</code>, the node
+is not matched; if the code evaluates to anything else, it is. For example,
+<code>${{true}}</code> is equivalent to <code>$_</code>. Code evaluated in a replacement is treated
+as a string.</p>
+<p>The APIs available to code in patterns differ from those available to
+replacements and where clauses. For example, code in patterns can write to
+metavariables; code in replacements and where clauses can only read them.
+In the rest of this guide, (P) denotes an API available only to patterns,
+(A) denotes an API available in all contexts.</p>
+<h2 id="globals"><a class="header" href="#globals">Globals</a></h2>
+<p>(P) Lua code has access to a global variable <code>t</code> that holds the text of the
+syntax node in question. For example, this pattern finds let-bound variables
+that contain the letter <code>x</code>:</p>
+<pre><code>let ${{string.find(t, &quot;x&quot;)}} = $_;
+</code></pre>
+<p>(A) All other metavariables are bound to globals; the pattern author is
+responsible for not clobbering other important globals.</p>
+<h2 id="conventions"><a class="header" href="#conventions">Conventions</a></h2>
+<p>In the remainder of this document:</p>
+<ul>
+<li><code>Option&lt;T&gt;</code> means <code>T</code> or <code>nil</code>.</li>
+<li>If the return type is omitted, it is <code>nil</code>.</li>
+</ul>
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<ul>
+<li>
+<p><code>bind(String)</code>, (P): Binds a metavariable to the current node</p>
+<ul>
+<li>1st argument: Metavariable name (without the <code>$</code>)</li>
+<li>Example: <code>${{bind(&quot;x&quot;)}}</code> is equivalent to <code>$x</code> if <code>$x</code> is not yet bound</li>
+<li>Note: This function can overwrite existing bindings; use with care</li>
+</ul>
+</li>
+<li>
+<p><code>match(String) -&gt; bool</code>, (P): Matches the current node against a pattern</p>
+<ul>
+<li>1st argument: A pattern</li>
+<li>Returns: Whether or not the current node matches the pattern</li>
+<li>Example: Patterns can be negated with <code>match</code>: <code>${{not match(&quot;&lt;pattern&gt;&quot;)}}</code>,
+e.g., <code>${{not match(&quot;${{false}}&quot;)}}</code> is equivalent to <code>${{true}}</code>.</li>
+<li>Note: Metavariables in the argument pattern are inherited from the overall
+pattern; variables bound inside the argument pattern are not bound outside
+of it.</li>
+</ul>
+</li>
+<li>
+<p><code>meta(String) -&gt; Option&lt;String&gt;</code>, (A): Returns the binding for a metavariable</p>
+<ul>
+<li>1st argument: Metavariable name (without the <code>$</code>)</li>
+<li>Returns: Value of the metavariable, or <code>nil</code> if there is none</li>
+<li>Example: <code>${{meta(&quot;x&quot;) == t}}</code> is roughly equivalent to <code>$x</code> if <code>$x</code> is
+already bound (though not exactly: it matches <em>textually</em> instead of
+<em>structurally</em>)</li>
+</ul>
+</li>
+<li>
+<p><code>rec(String) -&gt; bool</code>, (P): Recursively matches all descendants of the current
+node against a pattern</p>
+<ul>
+<li>1st argument: A pattern</li>
+<li>Returns: Whether or not some descendant of the current node matches the
+pattern</li>
+<li>Example: <code>let x = ${{rec(&quot;$x&quot;)}} + $y;</code> matches <code>let a = (b + a) + c;</code></li>
+<li>Note: Metavariables in the argument pattern are inherited from the overall
+pattern; variables bound inside the argument pattern are not bound outside
+of it.</li>
+</ul>
+</li>
+<li>
+<p><code>rx(String, String) -&gt; bool</code>, (A): Returns whether its first argument is a
+regular expression that matches its second.</p>
+<ul>
+<li>1st argument: Regular expression</li>
+<li>2nd argument: String to be matched</li>
+<li>Returns: Whether the regex matched the string</li>
+</ul>
+</li>
+</ul>
+<h2 id="nodes"><a class="header" href="#nodes">Nodes</a></h2>
+<p>In addition to the &quot;textual&quot; API given by the <code>t</code> variable, Lua code has
+access to a &quot;structured&quot; API for AST nodes. The type of node objects is denoted
+<code>Node</code>. The &quot;current node&quot; is stored in the global <code>focus</code>.</p>
+<p><code>Node</code> methods:</p>
+<ul>
+<li><code>child(int) -&gt; Option&lt;Node&gt;</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.child">Upstream docs</a></li>
+<li><code>child_count() -&gt; int</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.child_count">Upstream docs</a></li>
+<li><code>kind() -&gt; String</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.kind">Upstream docs</a></li>
+<li><code>next_named_sibling() -&gt; Option&lt;Node&gt;</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.next_named_sibling">Upstream docs</a></li>
+<li><code>next_sibling() -&gt; Option&lt;Node&gt;</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.next_sibling">Upstream docs</a></li>
+<li><code>prev_named_sibling() -&gt; Option&lt;Node&gt;</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.prev_named_sibling">Upstream docs</a></li>
+<li><code>prev_sibling() -&gt; Option&lt;Node&gt;</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.prev_sibling">Upstream docs</a></li>
+<li><code>parent() -&gt; Option&lt;Node&gt;</code>:
+<a href="https://docs.rs/tree-sitter/latest/tree_sitter/struct.Node.html#method.parent">Upstream docs</a></li>
+<li><code>text() -&gt; String</code>: Return the text of the node</li>
+</ul>
+<h2 id="node-kinds"><a class="header" href="#node-kinds">Node kinds</a></h2>
+<p>Each node in a tree-sitter parse tree has a <em>kind</em>, e.g., &quot;binary expression&quot;
+or &quot;compound statement&quot;. Some of these kinds are <em>children</em> of each other,
+e.g., &quot;call expression&quot; might be a child of &quot;expression&quot;. The following
+functions can query such relationships:</p>
+<ul>
+<li><code>is_child_of(String, String) -&gt; bool</code>, (A)</li>
+<li><code>is_descendant_of(String, String) -&gt; bool</code>, (A): Recursive, reflexive version
+of <code>is_child_of</code></li>
+<li><code>is_parent_of(String, String) -&gt; bool</code>, (A)</li>
+<li><code>is_ancestor_of(String, String) -&gt; bool</code>, (A): Recursive, reflexive version
+of <code>is_parent_of</code></li>
+</ul>
+<p>See <code>grammar.js</code> and <code>node_types.json</code> for the grammar in question for a list
+of possible node kinds (or just use the pattern <code>${{print(focus:kind())}}</code>).</p>
+<h2 id="state-and-evaluation-order"><a class="header" href="#state-and-evaluation-order">State and evaluation order</a></h2>
+<p>When matching against a single node, Lua snippets in a pattern share the same
+global state. Therefore, they can interact via global variables. For example,
+the following pattern is functionally equivalent to
+<code>let $_ = $_;</code>:</p>
+<pre><code>let ${{foo = &quot;bar&quot;; return true}} = ${{foo == &quot;bar&quot;}};
+</code></pre>
+<p>Evaluation order is depth-first, left-to-right. But be careful! It's hard to
+tell when and how many times a given snippet will execute.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="install.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+                                                    <a rel="next" href="dev.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="install.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+                                    <a rel="next" href="dev.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+        
+    </body>
+</html>
