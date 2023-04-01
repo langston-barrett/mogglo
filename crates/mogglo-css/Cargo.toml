@@ -1,6 +1,6 @@
 [package]
 name = "mogglo-css"
-version = "0.1.0"
+version = "0.1.1-rc.1"
 edition = "2021"
 description = "Multi-language AST-based code search and rewriting"
 keywords = ["ast", "codemod", "code-search", "grep", "tree-sitter"]
@@ -12,5 +12,5 @@ repository = "https://github.com/langston-barrett/mogglo"
 
 [dependencies]
 anyhow = "1"
-mogglo = { version = "0.1.0", features = ["cli"], path = "../mogglo" }
+mogglo = { version = "0.1.1-rc.1", features = ["cli"], path = "../mogglo" }
 tree-sitter-css = "0.19"
