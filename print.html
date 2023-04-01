@@ -455,12 +455,12 @@ cd mogglo
 </code></pre>
 <p>You can find binaries in <code>target/release</code>. Run tests with <code>cargo test</code>.</p>
 <h2 id="docs"><a class="header" href="#docs">Docs</a></h2>
-<p>HTML documentation can be built with <code>mdbook</code>:</p>
+<p>HTML documentation can be built with <a href="https://rust-lang.github.io/mdBook/">mdBook</a>:</p>
 <pre><code class="language-sh">cd doc
 mdbook build
 </code></pre>
 <h2 id="test"><a class="header" href="#test">Test</a></h2>
-<p>Run end-to-end tests with <code>lit</code> and <code>FileCheck </code>:</p>
+<p>Run end-to-end tests with <a href="https://www.llvm.org/docs/CommandGuide/lit.html"><code>lit</code></a> and <a href="https://www.llvm.org/docs/CommandGuide/FileCheck.html"><code>FileCheck</code></a>:</p>
 <pre><code class="language-sh">cargo build
 lit --path=$PWD/test/bin --path=$PWD/target/debug test/
 </code></pre>
