@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Overview - Mogglo</title>
+        <title>Contributing - Mogglo</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">1.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">2.</strong> Guide</a></li><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">3.</strong> Installation</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">5.</strong> Development</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">User documentation</li><li class="chapter-item expanded "><a href="contributing.html" class="active"><strong aria-hidden="true">1.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="guide.html"><strong aria-hidden="true">2.</strong> Guide</a></li><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">3.</strong> Installation</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> Lua API reference</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documentation</li><li class="chapter-item expanded "><a href="dev.html"><strong aria-hidden="true">5.</strong> Development</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -143,101 +143,32 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
-<p>Mogglo is a multi-language AST-based code search and rewriting tool. Mogglo
-supports embedding <a href="https://www.lua.org/">Lua</a> code in search patterns and replacements.</p>
-<p>Mogglo focuses on the following goals:</p>
+                        <h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
+<p>Thank you for your interest in Mogglo! We welcome and appreciate all kinds of
+contributions. Please feel free to file and issue or open a pull request.</p>
+<p>You may want to take a look at:</p>
 <ul>
-<li><em>Minimal setup</em>: Mogglo will work right away on any codebase in a
-supported language.</li>
-<li><em>Many languages</em>: 12 and counting!</li>
-<li><em>High-quality grammars</em>: Mogglo is based on <a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a>
-grammars.</li>
-<li><em>Lua</em>: Mogglo exposes a rich API to embedded Lua snippets.</li>
+<li>
+<p>The <a href="dev.html">developer guide</a></p>
+</li>
+<li>
+<p>The <a href="https://github.com/langston-barrett/mogglo/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22">issues labeled &quot;good first issue&quot;</a></p>
+</li>
+<li>
+<p>The <a href="https://github.com/langston-barrett/mogglo/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22">issues labeled &quot;help wanted&quot;</a></p>
+</li>
 </ul>
-<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
-<p>The following examples give a taste of Mogglo. Here's how to find pointless
-assignments of an expression to itself:</p>
-<pre><code class="language-sh">mogglo-rust --detail 'let $x = $x;' ./**/*.rs
-</code></pre>
-<p>The <code>--detail</code> flag helps you understand why something matched, it produces
-fancy output like:</p>
-<pre><code>   ╭─[./test/nonlinear.rs:4:1]
-   │
- 4 │ ╭─▶ let a =
-   │ │       ┬
-   │ │       ╰── $x
- 5 │ ├─▶     a;
-   │ │       ┬
-   │ │       ╰──── $x
-   │ │
-   │ ╰──────────── let $x = $x;
-   │
-   │ Note: Multiple occurrences of $x were structurally equal
-───╯
-</code></pre>
-<p>Lua code is wrapped in braces. Lua can recursively match patterns with <code>rec</code>.
-Here's a pattern to detect out-of-bounds array accesses:</p>
-<pre><code class="language-sh">mogglo-rust 'while $i &lt;= $buf.len() { ${{ rec(&quot;$buf.get($i)&quot;) }} }' ./**/*.rs
-</code></pre>
-<p>Here's how to <a href="https://en.wikipedia.org/wiki/Loop_unrolling">unroll</a> a simple loop:</p>
-<pre><code class="language-sh">mogglo-rust \
-  'for $i in 0..$h { $b; }' \
-  --where 'h_num = tonumber(h); return h_num ~= nil and h_num % 4 == 0' \
-  --replace 'for $i in 0..${{ string.format(&quot;%.0f&quot;, h / 4) }} { $b; $b; $b; $b; }' \
-  ./*/**.rs
-</code></pre>
-<p>This transformation demonstrates the power of using Lua: it can't be done with
-regular expression substitutions and would be very difficult with other codemod
-tools.</p>
-<p>Lua snippets can match and negate patterns, or even compose new patterns
-dynamically! See <a href="./guide.html">the guide</a> for more detailed explanations,
-examples, and features.</p>
-<h2 id="supported-languages"><a class="header" href="#supported-languages">Supported languages</a></h2>
-<p>Mogglo currently ships pre-built executables for the following languages:</p>
-<ul>
-<li><a href="./crates/mogglo-c">C</a></li>
-<li><a href="./crates/mogglo-css">CSS</a></li>
-<li><a href="./crates/mogglo-java">Java</a></li>
-<li><a href="./crates/mogglo-javascript">JavaScript</a></li>
-<li><a href="./crates/mogglo-rust">Rust</a></li>
-<li><a href="./crates/mogglo-typescript">TypeScript</a></li>
-<li><a href="./crates/mogglo-swift">Swift</a></li>
-</ul>
-<p>Additionally, the following can be built from source or via Cargo/crates.io:</p>
-<ul>
-<li><a href="./crates/mogglo-cpp">C++</a></li>
-<li><a href="./crates/mogglo-haskell">Haskell</a></li>
-<li><a href="./crates/mogglo-html">HTML</a></li>
-<li><a href="./crates/mogglo-python">Python</a></li>
-<li><a href="./crates/mogglo-ruby">Ruby</a></li>
-</ul>
-<p>Languages are very easy to add, so file an issue or a PR if you want a new one!</p>
-<h2 id="comparison-to-related-tools"><a class="header" href="#comparison-to-related-tools">Comparison to related tools</a></h2>
-<p>Mogglo is not as polished as any of the tools mentioned in this section.</p>
-<p>Mogglo is most similar to other multi-language code search and codemod tools.</p>
-<ul>
-<li>Mogglo is similar to <a href="https://ast-grep.github.io/">ast-grep</a>, but supports more languages and
-allows embedding Lua in patterns.</li>
-<li>Mogglo is similar to <a href="https://comby.dev/">Comby</a>. Comby uses lower-fidelity parsers, but
-is much more battle-tested and better documented. Mogglo also embeds Lua in
-patterns.</li>
-<li>Mogglo has less semantic understanding of code (e.g., name resolution) than
-<a href="https://semgrep.dev/">Semgrep</a> or <a href="https://codeql.github.com/">CodeQL</a>, but is much easier to set up.</li>
-</ul>
-<p>There are many excellent language-specific code search and codemod tools; these
-tend to be more polished but less general than Mogglo.</p>
-<ul>
-<li><a href="https://github.com/facebookincubator/retrie">retrie</a></li>
-<li><a href="https://github.com/weggli-rs/weggli">weggli</a></li>
-</ul>
+<p>If you have questions, please ask them on the <a href="https://github.com/langston-barrett/mogglo/discussions">discussions page</a>!</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
                         
-                                                    <a rel="next" href="contributing.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="guide.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -247,8 +178,11 @@ tend to be more polished but less general than Mogglo.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
                 
-                                    <a rel="next" href="contributing.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="guide.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>
