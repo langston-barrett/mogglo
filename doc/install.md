@@ -2,14 +2,14 @@
 
 ## Pre-compiled binaries
 
-Statically-linked Linux binaries are available on the [releases page][releases].
+Pre-compiled binaries are available on the [releases page][releases].
 
 ### Fetching binaries with cURL
 
 You can download binaries with `curl` like so (replace `X.Y.Z` with a real
-version number and `LANG` with a supported language):
+version number, `LANG` with a supported language, and `TARGET` with your OS):
 ```sh
-curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG -o mogglo-LANG
+curl -sSL https://github.com/langston-barrett/mogglo/releases/download/vX.Y.Z/mogglo-LANG_TARGET -o mogglo-LANG
 ```
 
 ## Build from source
