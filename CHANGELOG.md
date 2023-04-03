@@ -5,7 +5,7 @@
 ## [0.1.1] - 2023-04-01
 
 - Bump dependencies
-- Releases now include binaries for GNU Linux, OSX, and Windows
+- Releases now include binaries for GNU Linux and OSX
 
 ## [0.1.0] - 2023-03-27
 
