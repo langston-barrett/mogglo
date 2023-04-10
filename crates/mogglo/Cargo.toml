@@ -24,7 +24,7 @@ rlua = { version = "0.19", features = ["lua-no-oslib"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tree-sitter = "0.20"
-tree-sitter-edit = "0.1"
+tree-sitter-edit = "0.3"
 
 [features]
 default = []
