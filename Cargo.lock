@@ -607,7 +607,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-haskell"
 version = "0.14.0"
-source = "git+https://github.com/tree-sitter/tree-sitter-haskell#98fc7f59049aeb713ab9b72a8ff25dcaaef81087"
+source = "git+https://github.com/tree-sitter/tree-sitter-haskell#3241b683cc1eaa466afb83b9a5592ab39caaa2fa"
 dependencies = [
  "cc",
  "tree-sitter",
