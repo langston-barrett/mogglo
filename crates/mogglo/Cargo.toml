@@ -16,7 +16,7 @@ tree-sitter-rust = "0.20"
 
 [dependencies]
 anyhow = { version = "1", optional = true }
-ariadne = { version = "0.2", optional = true }
+ariadne = { version = "0.3", optional = true }
 clap = { version = "4", features = ["derive"], optional = true }
 num_cpus = { version = "1", optional = true }
 regex = "1"
