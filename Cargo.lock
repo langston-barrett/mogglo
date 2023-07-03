@@ -430,9 +430,9 @@ checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
 
 [[package]]
 name = "rlua"
-version = "0.19.5"
+version = "0.19.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "753540fb29c9a615ce5dd64be5c957271adc887c8424555fc372e0b88ebde074"
+checksum = "5d33e5ba15c3d43178f283ed5863d4531e292fc0e56fb773f3bea45f18e3a42a"
 dependencies = [
  "bitflags",
  "bstr",
@@ -445,9 +445,9 @@ dependencies = [
 
 [[package]]
 name = "rlua-lua51-sys"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48897a86eeec0a3196623d93479001c90c60192fd55107b0c4b8c82bbaa22091"
+checksum = "5c8f4636b03fa54b5c154415f1d9333cec7a7e3bd6bc64c092a2196e488cfd52"
 dependencies = [
  "cc",
  "libc",
@@ -456,9 +456,9 @@ dependencies = [
 
 [[package]]
 name = "rlua-lua53-sys"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da974aa1c92453fc699657adc819356af58d97134d0e589dbb0a80a002ad6986"
+checksum = "c930c9de241450277dec8617cfa540eaed711db7b0fd894316d7d7c0b6b8f4a4"
 dependencies = [
  "cc",
  "libc",
@@ -467,9 +467,9 @@ dependencies = [
 
 [[package]]
 name = "rlua-lua54-sys"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28b1af7df13ef18849005d82d8d16411ebdb7f35f9dcfcb790a4ce49bc1e05aa"
+checksum = "7aafabafe1895cb4a2be81a56d7ff3d46bf4b5d2f9cfdbea2ed404cdabe96474"
 dependencies = [
  "cc",
  "libc",
