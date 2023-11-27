@@ -32,8 +32,8 @@ pub enum FindExpr {
 }
 
 impl FindExpr {
-    const ANONYMOUS: &str = "_";
-    const ELLIPSIS: &str = "..";
+    const ANONYMOUS: &'static str = "_";
+    const ELLIPSIS: &'static str = "..";
 
     pub fn parse(s: String) -> Self {
         if s == Self::ANONYMOUS {
