@@ -20,6 +20,10 @@ use crate::{
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
+    /// Confirm before each replacement
+    #[arg(long)]
+    pub confirm: bool,
+
     /// Show details
     #[arg(long)]
     pub detail: bool,
@@ -193,10 +197,35 @@ pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()>
         let mut offset: isize = 0;
         for m in pat.matches(&tree, &text0, &Env::default(), args.recursive, args.limit) {
             if let Some(replace) = &args.replace {
+                if !args.only_matching {
+                    match_report(
+                        if args.dry_run {
+                            "Would replace"
+                        } else {
+                            "Replacing"
+                        },
+                        f,
+                        &text0,
+                        m.root.byte_range(),
+                        &args.pattern,
+                        &m.env,
+                        args.detail,
+                        "Match",
+                    )?;
+                    if args.confirm {
+                        eprint!("Replace (Y/n)? ");
+                        let mut buffer = String::new();
+                        io::stdin().read_line(&mut buffer)?;
+                        if !(buffer == "\n" || buffer == "Y\n" || buffer == "y\n") {
+                            continue;
+                        }
+                    }
+                }
+
                 let p = Pattern::parse(language, &node_types, replace.to_string());
                 // TODO: Computes replacement twice...
                 let replacement = p.replacement(&m, &text);
-                let (start, end) = p.replace(m.clone(), &mut text, offset);
+                let (start, end) = p.replace(m, &mut text, offset);
                 let match_size = isize::try_from(end - start).unwrap();
                 let replacement_size = isize::try_from(replacement.len()).unwrap();
                 offset += replacement_size - match_size;
@@ -206,20 +235,7 @@ pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()>
                     println!("{}", text);
                     continue;
                 }
-                match_report(
-                    if args.dry_run {
-                        "Would replace"
-                    } else {
-                        "Replacing"
-                    },
-                    f,
-                    &text0,
-                    m.root.byte_range(),
-                    &args.pattern,
-                    &m.env,
-                    args.detail,
-                    "Match",
-                )?;
+
                 match_report(
                     "With",
                     f,
