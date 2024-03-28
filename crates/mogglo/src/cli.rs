@@ -177,7 +177,7 @@ pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()>
 
     // TODO: Parallelize
     for f in &args.files {
-        let (tree, text) = if f == "-" {
+        let (tree, mut text) = if f == "-" {
             let text = stdin_string()?;
             let tree = crate::pattern::parse(language, &text);
             (tree, text)
@@ -187,11 +187,23 @@ pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()>
             (tree, text)
         };
         handle_parse_errors(f, &tree, &args.on_parse_error);
-        for m in pat.matches(&tree, &text, &Env::default(), args.recursive, args.limit) {
+        let text0 = text.clone();
+        // When doing multiple replacements for the same pattern, the earlier
+        // ones affect the offset of the later ones.
+        let mut offset: isize = 0;
+        for m in pat.matches(&tree, &text0, &Env::default(), args.recursive, args.limit) {
             if let Some(replace) = &args.replace {
+                let p = Pattern::parse(language, &node_types, replace.to_string());
+                // TODO: Computes replacement twice...
+                let replacement = p.replacement(&m, &text);
+                let (start, end) = p.replace(m.clone(), &mut text, offset);
+                let match_size = isize::try_from(end - start).unwrap();
+                let replacement_size = isize::try_from(replacement.len()).unwrap();
+                offset += replacement_size - match_size;
+
                 if args.only_matching {
-                    let p = Pattern::parse(language, &node_types, replace.to_string());
-                    println!("{}", p.replace(vec![m], text.to_string()));
+                    // TODO: Don't print whole text here...?
+                    println!("{}", text);
                     continue;
                 }
                 match_report(
@@ -201,31 +213,23 @@ pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()>
                         "Replacing"
                     },
                     f,
-                    &text,
+                    &text0,
                     m.root.byte_range(),
                     &args.pattern,
                     &m.env,
                     args.detail,
                     "Match",
                 )?;
-                let p = Pattern::parse(language, &node_types, replace.to_string());
-                // TODO: Computes replacement twice...
-                let replacement = p.replacement(&m, &text);
-                let replaced = p.replace(vec![m.clone()], text.clone());
-                let start = replaced.find(&replacement).unwrap();
                 match_report(
                     "With",
                     f,
-                    &replaced,
+                    &text,
                     start..start + replacement.len(),
                     &args.pattern,
                     &Env::default(),
                     args.detail,
                     "Replacement",
                 )?;
-                if !args.dry_run && f != "-" {
-                    std::fs::write(f, replaced)?;
-                }
             } else if args.only_matching {
                 println!("{}", m.root.utf8_text(text.as_bytes()).unwrap());
             } else {
@@ -240,6 +244,9 @@ pub fn main(language: Language, node_types_json_str: &'static str) -> Result<()>
                     "Match",
                 )?;
             }
+        }
+        if !args.dry_run && f != "-" {
+            std::fs::write(f, text)?;
         }
     }
     Ok(())

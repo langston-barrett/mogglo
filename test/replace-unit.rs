@@ -2,5 +2,5 @@
 
 // CHECK: let a = 5;
 let a = ();
-// CHECK: let 5 = 5;
+// CHECK: let () = 5;
 let () = ();

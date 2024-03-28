@@ -683,14 +683,15 @@ impl<'nts> Pattern<'nts> {
         replacement
     }
 
-    pub fn replace(&self, matches: Vec<Match>, mut text: String) -> String {
-        for m in matches {
-            text = text.replace(
-                m.root.utf8_text(text.as_bytes()).unwrap(),
-                &self.replacement(&m, &text),
-            )
-        }
-        text
+    pub fn replace(&self, m: Match, text: &mut String, offset: isize) -> (usize, usize) {
+        let mut start = isize::try_from(m.root.start_byte()).unwrap();
+        start += offset;
+        let start = usize::try_from(start).unwrap();
+        let mut end = isize::try_from(m.root.end_byte()).unwrap();
+        end += offset;
+        let end = usize::try_from(end).unwrap();
+        text.replace_range(start..end, &self.replacement(&m, &text));
+        (start, end)
     }
 
     pub fn r#where(&mut self, iter: &mut impl Iterator<Item = LuaCode>) {
@@ -791,7 +792,9 @@ mod tests {
             .match_node(Env::default(), candidate)
             .unwrap();
         let p = Pattern::parse(language(), &NODE_TYPES, replace.to_string());
-        p.replace(vec![m], text.to_string())
+        let mut text = text.to_string();
+        p.replace(m, &mut text, 0);
+        text
     }
 
     #[test]
