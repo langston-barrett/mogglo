@@ -690,7 +690,7 @@ impl<'nts> Pattern<'nts> {
         let mut end = isize::try_from(m.root.end_byte()).unwrap();
         end += offset;
         let end = usize::try_from(end).unwrap();
-        text.replace_range(start..end, &self.replacement(&m, &text));
+        text.replace_range(start..end, &self.replacement(&m, text));
         (start, end)
     }
 
