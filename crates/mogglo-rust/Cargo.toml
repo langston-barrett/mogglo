@@ -13,4 +13,4 @@ repository = "https://github.com/langston-barrett/mogglo"
 [dependencies]
 anyhow = "1"
 mogglo = { version = "0.1.1", features = ["cli"], path = "../mogglo" }
-tree-sitter-rust = "0.20"
+tree-sitter-rust = "0.21"
